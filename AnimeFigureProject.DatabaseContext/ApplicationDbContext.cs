@@ -16,7 +16,6 @@ namespace AnimeFigureProject.DatabaseContext
         public DbSet<Review>? Reviews {  get; set; }
         public DbSet<EntityModels.Type>? Types {  get; set; }
 
-        public ApplicationDbContext() {}
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
