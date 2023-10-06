@@ -1,16 +1,11 @@
-﻿namespace AnimeFigureProject.EntityModels
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace AnimeFigureProject.EntityModels
 {
-    
-    public class Collector
+
+    public class Collector : IdentityUser
     {
 
-        public int Id { get; set; }
-        
-        public required string Email { get; set; }
-        public required string PasswordHash { get; set; }
-
-        public string? Name { get; set; }
-        
         public List<Collection>? Collections { get; set; }
 
     }
