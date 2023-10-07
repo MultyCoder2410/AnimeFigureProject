@@ -84,10 +84,32 @@ namespace AnimeFigureProject.Api.Controllers
         }
 
         [HttpGet("filteredanimefigures")]
-        public IActionResult GetFilteredAnimeFigures()
+        public IActionResult GetFilteredAnimeFigures(string? searchTerm, [FromQuery] int[]? brandIds, [FromQuery] int[]? TypeIds, [FromQuery] int[]? originIds)
         {
 
-            return Ok(dbContext.AnimeFigures);
+            IQueryable<AnimeFigure> animeFigures = dbContext?.AnimeFigures;
+
+            if (animeFigures == null)
+                return NotFound();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+                animeFigures = animeFigures.Where(f => f.Name != null && f.Name.Contains(searchTerm));
+
+            if (brandIds != null && brandIds.Length > 0)
+                animeFigures = animeFigures.Where(f => f.Brand != null && brandIds.Contains(f.Brand.Id));
+
+            if (TypeIds != null && TypeIds.Length > 0)
+                animeFigures = animeFigures.Where(f => f.Type != null && TypeIds.Contains(f.Type.Id));
+
+            if (originIds != null && originIds.Length > 0)
+            {
+
+                var filteredFigures = animeFigures.Include(f => f.Origins).AsEnumerable().Where(f => f.Origins != null && f.Origins.Any(origin => originIds.Contains(origin.Id))).Select(f => f.Id);
+                animeFigures = animeFigures.Where(f => filteredFigures.Contains(f.Id));
+
+            }
+
+            return Ok(animeFigures);
 
         }
 
@@ -124,11 +146,24 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        [HttpGet("type")]
-        public async Task<IActionResult> GetType()
+        [HttpGet("types")]
+        public async Task<IActionResult> GetTypes()
         {
 
-            return Ok();
+            return Ok(dbContext?.Types);
+
+        }
+
+        [HttpGet("type/{id}")]
+        public async Task<IActionResult> GetType(int id)
+        {
+
+            EntityModels.Type? type = await dbContext?.Types?.FirstOrDefaultAsync(t => t.Id == id);
+
+            if (type == null)
+                return NotFound();
+
+            return Ok(type);
 
         }
 
@@ -150,11 +185,24 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        [HttpGet("brand")]
-        public async Task<IActionResult> GetBrand()
+        [HttpGet("brands")]
+        public async Task<IActionResult> GetBrands()
         {
 
-            return Ok();
+            return Ok(dbContext?.Brands);
+
+        }
+
+        [HttpGet("brand/{id}")]
+        public async Task<IActionResult> GetBrand(int id)
+        {
+
+            Brand? brand = await dbContext?.Brands?.FirstOrDefaultAsync(b => b.Id == id);
+
+            if (brand == null)
+                return NotFound();
+
+            return Ok(brand);
 
         }
 
@@ -176,11 +224,24 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        [HttpGet("origin")]
-        public async Task<IActionResult> GetOrigin()
+        [HttpGet("origins")]
+        public async Task<IActionResult> GetOrigins()
         {
 
-            return Ok();
+            return Ok(dbContext?.Origins);
+
+        }
+
+        [HttpGet("origin/{id}")]
+        public async Task<IActionResult> GetOrigin(int id)
+        {
+
+            Origin origin = await dbContext?.Origins?.FirstOrDefaultAsync(o => o.Id == id);
+
+            if (origin == null)
+                return NotFound();
+
+            return Ok(origin);
 
         }
         
@@ -202,11 +263,24 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        [HttpGet("category")]
-        public async Task<IActionResult> GetCategory()
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
         {
 
-            return Ok();
+            return Ok(dbContext?.Categories);
+
+        }
+
+        [HttpGet("categorie/{id}")]
+        public async Task<IActionResult> GetCategory(int id)
+        {
+
+            Category category = await dbContext?.Categories?.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+                return NotFound();
+
+            return Ok(category);
 
         }
 
@@ -228,11 +302,24 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        [HttpGet("review")]
-        public async Task<IActionResult> GetReview()
+        [HttpGet("reviews")]
+        public async Task<IActionResult> GetReviews()
         {
 
-            return Ok();
+            return Ok(dbContext?.Reviews);
+
+        }
+
+        [HttpGet("review/{id}")]
+        public async Task<IActionResult> GetReview(int id)
+        {
+
+            Review review = await dbContext?.Reviews?.FirstOrDefaultAsync(r => r.Id == id);
+
+            if (review == null)
+                return NotFound();
+
+            return Ok(review);
 
         }
 

@@ -1,9 +1,6 @@
 using AnimeFigureProject.DatabaseContext;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
-using System.Text;
 using AnimeFigureProject.EntityModels;
 
 namespace AnimeFigureProject.Api
