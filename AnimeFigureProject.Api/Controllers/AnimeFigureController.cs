@@ -83,6 +83,15 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        [HttpGet("filteredanimefigures")]
+        public IActionResult GetFilteredAnimeFigures()
+        {
+
+            return Ok(dbContext.AnimeFigures);
+
+        }
+
+
         // GET api/<AnimeFigureController>/5
         [HttpGet("animefigure/{id}")]
         public async Task<IActionResult> GetAnimeFigure(int id)
@@ -94,6 +103,163 @@ namespace AnimeFigureProject.Api.Controllers
                 return BadRequest("Invalid anime figure id.");
 
             return Ok(animeFigure);
+
+        }
+
+        [Authorize]
+        [HttpPost("animefigure")]
+        public async Task<IActionResult> PostAnimeFigure()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("animefigure/{id}")]
+        public async Task<IActionResult> PutAnimeFigure()
+        {
+
+            return Ok();
+
+        }
+
+        [HttpGet("type")]
+        public async Task<IActionResult> GetType()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPost("type")]
+        public async Task<IActionResult> PostType()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("type/{id}")]
+        public async Task<IActionResult> PutType(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [HttpGet("brand")]
+        public async Task<IActionResult> GetBrand()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPost("brand")]
+        public async Task<IActionResult> PostBrand()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("brand/{id}")]
+        public async Task<IActionResult> PutBrand(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [HttpGet("origin")]
+        public async Task<IActionResult> GetOrigin()
+        {
+
+            return Ok();
+
+        }
+        
+        [Authorize]
+        [HttpPost("origin")]
+        public async Task<IActionResult> PostOrigin()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("origin/{id}")]
+        public async Task<IActionResult> PutOrigin(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [HttpGet("category")]
+        public async Task<IActionResult> GetCategory()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPost("category")]
+        public async Task<IActionResult> PostCategory()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("category/{id}")]
+        public async Task<IActionResult> PutCategory(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [HttpGet("review")]
+        public async Task<IActionResult> GetReview()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPost("review")]
+        public async Task<IActionResult> PostReview()
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("review/{id}")]
+        public async Task<IActionResult> PutReview(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpDelete("review/{id}")]
+        public async Task<IActionResult> DeleteReview(int id)
+        {
+
+            return Ok();
 
         }
 
@@ -160,6 +326,7 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        [Authorize]
         [HttpPut("collection/{id}")]
         public async Task<IActionResult> PutCollection(int id, string name)
         {
@@ -181,6 +348,25 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        [Authorize]
+        [HttpPut("collection/addfigure/{id}")]
+        public async Task<IActionResult> PutCollectionFigure(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpPut("collection/removefigure/{id}")]
+        public async Task<IActionResult> PutCollectionRemoveFigure(int id)
+        {
+
+            return Ok();
+
+        }
+
+        [Authorize]
         [HttpDelete("collection/{id}")]
         public async Task<IActionResult> DeleteCollection(int id)
         {
