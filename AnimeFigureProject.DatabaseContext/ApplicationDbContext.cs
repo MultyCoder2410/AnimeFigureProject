@@ -1,12 +1,15 @@
 ﻿using AnimeFigureProject.EntityModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnimeFigureProject.DatabaseContext
 {
     
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Collector, IdentityRole<int>, int>
     {
 
+        public DbSet<IdentityUserClaim<string>> UserClaims { get; set; }
         public DbSet<AnimeFigure>? AnimeFigures { get; set; }
         public DbSet<Brand>? Brands {  get; set; }
         public DbSet<Category>? Categories { get; set; }
@@ -23,6 +26,13 @@ namespace AnimeFigureProject.DatabaseContext
         {
 
             optionsBuilder.UseSqlServer("Server=.;Database=AnimeFigureProject;Trusted_Connection=True;TrustServerCertificate=True");
+
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            base.OnModelCreating(modelBuilder);
 
         }
 

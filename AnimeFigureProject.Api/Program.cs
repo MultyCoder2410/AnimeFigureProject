@@ -38,22 +38,8 @@ namespace AnimeFigureProject.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = "https://localhost:7217",
-                    ValidAudience = "https://localhost:7217",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GenerateRandomSecretKey(256)))
-                };
-
-            });
-
             builder.Services.AddProgramContext("Server=.;Database=AnimeFigureProject;Trusted_Connection=True;TrustServerCertificate=True");
-            builder.Services.AddIdentity<Collector, IdentityRole>(options =>
+            builder.Services.AddIdentity<Collector, IdentityRole<int>>(options =>
             {
 
                 options.Password.RequiredLength = 8;
@@ -61,6 +47,7 @@ namespace AnimeFigureProject.Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = true;
+                options.User.RequireUniqueEmail = true;
 
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()

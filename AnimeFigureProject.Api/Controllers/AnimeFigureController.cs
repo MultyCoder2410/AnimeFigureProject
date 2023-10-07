@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AnimeFigureProject.EntityModels;
 using AnimeFigureProject.DatabaseContext;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
@@ -37,25 +34,19 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username))
                 return BadRequest("Email, password, and username are required.");
 
-            SHA256 sha256 = SHA256.Create();
-            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-            string hashedPassword = Convert.ToBase64String(hashedBytes);
+            if (userManager == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: UserManager is null.");
 
             Collector newCollector = new Collector
             {
 
-                UserName = username,
+                UserName = email,
                 Email = email,
-                PasswordHash = hashedPassword,
                 Collections = new List<Collection>()
 
             };
 
-            if (userManager == null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: UserManager is null.");
-
-            var result = await userManager.CreateAsync(newCollector, hashedPassword);
+            var result = await userManager.CreateAsync(newCollector, password);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
@@ -77,7 +68,7 @@ namespace AnimeFigureProject.Api.Controllers
             var result = await signInManager.PasswordSignInAsync(email, password, false, false);
 
             if (!result.Succeeded)
-                return BadRequest("Invalid login attempt.");
+                return BadRequest("Invalid login attempt. Details: " + string.Join(", ", result.ToString()));
 
             return Ok("Login successful");
 
@@ -111,33 +102,104 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetCollections()
         {
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            List<Collection> collections = await dbContext?.Collections.Where(c => c.Collectors != null && c.Collectors.Any(c => c.Id == userId)).Include(c => c.AnimeFigures).Include(c => c.Collectors).ToListAsync();
+            List<Collection> collections = await dbContext?.Collections.Where(c => c.Collectors != null && c.Collectors.Any(c => c.Id == int.Parse(userId))).Include(c => c.AnimeFigures).Include(c => c.Collectors).ToListAsync();
 
             return Ok(collections);
 
         }
 
-        // POST api/<AnimeFigureController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [Authorize]
+        [HttpGet("collection")]
+        public async Task<IActionResult> GetCollection(int id)
         {
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("No user was found.");
+
+            Collection collection = await dbContext?.Collections.FirstOrDefaultAsync(c => c.Id == id && c.Collectors.Any(c => c.Id == int.Parse(userId)));
+
+            if (collection == null)
+                return NotFound();
+
+            return Ok(collection);
+
         }
 
-        // PUT api/<AnimeFigureController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize]
+        [HttpPost("collection")]
+        public async Task<IActionResult> PostCollection(string name)
         {
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("No user was found.");
+
+            Collection collection = new Collection
+            {
+
+                Name = name,
+                TotalPrice = 0,
+                TotalValue = 0,
+                OwnerId = int.Parse(userId),
+                AnimeFigures = new List<AnimeFigure>()
+
+            };
+
+            dbContext?.Collections?.AddAsync(collection);
+            await dbContext?.SaveChangesAsync();
+
+            return Ok();
+
         }
 
-        // DELETE api/<AnimeFigureController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPut("collection/{id}")]
+        public async Task<IActionResult> PutCollection(int id, string name)
         {
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("No user was found.");
+
+            Collection? collection = await dbContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == int.Parse(userId));
+
+            if (collection == null)
+                return NotFound();
+
+            collection.Name = name;
+            dbContext.SaveChanges();
+
+            return Ok();
+
+        }
+
+        [HttpDelete("collection/{id}")]
+        public async Task<IActionResult> DeleteCollection(int id)
+        {
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("No user was found.");
+
+            Collection? collection = await dbContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == int.Parse(userId));
+
+            if (collection == null)
+                return NotFound();
+
+            dbContext?.Collections?.Remove(collection);
+            await dbContext?.SaveChangesAsync();
+
+            return Ok();
+
         }
 
     }
