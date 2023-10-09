@@ -20,7 +20,7 @@ namespace AnimeFigureProject.WebApp.Data
 
             AnimeFigure? animeFigure = null;
             HttpResponseMessage response = await httpClient.GetAsync("api/AnimeFigure/animefigure/" + id.ToString());
-
+            
             if (response.IsSuccessStatusCode)
                 animeFigure = await response.Content.ReadAsAsync<AnimeFigure>();
 

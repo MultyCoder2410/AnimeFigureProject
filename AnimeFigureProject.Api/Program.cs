@@ -1,7 +1,6 @@
-using AnimeFigureProject.DatabaseContext;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Cryptography;
-using AnimeFigureProject.EntityModels;
+using AnimeFigureProject.DatabaseContext.Data;
+using AnimeFigureProject.DatabaseContext.Authentication;
 
 namespace AnimeFigureProject.Api
 {
@@ -9,34 +8,22 @@ namespace AnimeFigureProject.Api
     public class Program
     {
 
-        public static string GenerateRandomSecretKey(int KeyLength)
-        {
-
-            byte[] key = new byte[KeyLength];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-
-                rng.GetBytes(key);
-
-            }
-
-            return Convert.ToBase64String(key);
-
-        }
-
         public static void Main(string[] args)
         {
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+           
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddProgramContext("Server=.;Database=AnimeFigureProject;Trusted_Connection=True;TrustServerCertificate=True");
-            builder.Services.AddIdentity<Collector, IdentityRole<int>>(options =>
+            builder.Services.AddProgramContext("Server=.;Database=AnimeFigureProjectData;Trusted_Connection=True;TrustServerCertificate=True");
+            builder.Services.AddSecurityContext("Server=.;Database=AnimeFigureProjectSecurity;Trusted_Connection=True;TrustServerCertificate=True");
+
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
 
                 options.Password.RequiredLength = 8;
@@ -47,7 +34,7 @@ namespace AnimeFigureProject.Api
                 options.User.RequireUniqueEmail = true;
 
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddEntityFrameworkStores<SecurityDbContext>()
             .AddDefaultTokenProviders();
 
             var app = builder.Build();

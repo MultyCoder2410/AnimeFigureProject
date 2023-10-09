@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AnimeFigureProject.EntityModels;
-using AnimeFigureProject.DatabaseContext;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using AnimeFigureProject.DatabaseContext.Data;
+using AnimeFigureProject.DatabaseContext.Authentication;
 
 namespace AnimeFigureProject.Api.Controllers
 {
@@ -14,19 +15,28 @@ namespace AnimeFigureProject.Api.Controllers
     public class AnimeFigureController : ControllerBase
     {
 
-        private readonly UserManager<Collector>? userManager;
-        private readonly SignInManager<Collector>? signInManager;
-        private readonly ApplicationDbContext? dbContext;
+        private readonly UserManager<IdentityUser>? userManager;
+        private readonly SignInManager<IdentityUser>? signInManager;
+        private readonly ApplicationDbContext? dbDataContext;
+        private readonly SecurityDbContext? dbSecurityContext;
 
-        public AnimeFigureController(UserManager<Collector> userManager, SignInManager<Collector> signInManager, ApplicationDbContext dbContext)
+        public AnimeFigureController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbDataContext, SecurityDbContext dbSecurityContext)
         {
 
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.dbContext = dbContext;
+            this.dbDataContext = dbDataContext;
+            this.dbSecurityContext = dbSecurityContext;
 
         }
 
+        /// <summary>
+        /// Registers a new user to the database.
+        /// </summary>
+        /// <param name="email">The mail of the new user</param>
+        /// <param name="password">The password of the new user</param>
+        /// <param name="username">The username of the new user</param>
+        /// <returns>If was able to create user</returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register(string email, string password, string username)
         {
@@ -37,19 +47,30 @@ namespace AnimeFigureProject.Api.Controllers
             if (userManager == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: UserManager is null.");
 
-            Collector newCollector = new Collector
+            IdentityUser newUser = new IdentityUser
             {
 
                 UserName = email,
                 Email = email,
-                Collections = new List<Collection>()
 
             };
 
-            var result = await userManager.CreateAsync(newCollector, password);
+            var result = await userManager.CreateAsync(newUser, password);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
+
+            Collector newCollector = new Collector
+            {
+
+                Name = username,
+                Collections = new List<Collection>(),
+                AuthenticationUserId = newUser.Id
+
+            };
+
+            dbDataContext?.Collectors?.Add(newCollector);
+            await dbDataContext?.SaveChangesAsync();
 
             return Ok("Registration successful");
 
@@ -74,12 +95,57 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        /// <summary>
+        /// Logs out user from api.
+        /// </summary>
+        /// <returns>Was logout succesful</returns>
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+
+            if (signInManager == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: signInManager is null.");
+
+            await signInManager.SignOutAsync();
+
+            return Ok("Logout succesful");
+
+        }
+
+        [Authorize]
+        [HttpDelete("account")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+
+            if (userManager == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: UserManager is null.");
+
+            if (signInManager == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: signInManager is null.");
+
+            IdentityUser? user = await userManager.GetUserAsync(User);
+            string? userId = user?.Id;
+
+            await signInManager.SignOutAsync();
+            IdentityResult result = await userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+                return BadRequest("\"Failed to delete account. Details: " + result.Errors.ToString());
+
+            dbDataContext?.Collectors?.Remove(dbDataContext.Collectors.FirstOrDefault(c => c.AuthenticationUserId == userId));
+            await dbDataContext?.SaveChangesAsync();
+
+            return Ok("Deleted account.");
+
+        }
+
         // GET: api/<AnimeFigureController>
         [HttpGet("animefigures")]
         public IActionResult GetAnimeFigures()
         {
 
-            return Ok(dbContext.AnimeFigures);
+            return Ok(dbDataContext?.AnimeFigures);
 
         }
 
@@ -87,7 +153,7 @@ namespace AnimeFigureProject.Api.Controllers
         public IActionResult GetFilteredAnimeFigures(string? searchTerm, [FromQuery] int[]? brandIds, [FromQuery] int[]? TypeIds, [FromQuery] int[]? originIds)
         {
 
-            IQueryable<AnimeFigure> animeFigures = dbContext?.AnimeFigures;
+            IQueryable<AnimeFigure> animeFigures = dbDataContext?.AnimeFigures;
 
             if (animeFigures == null)
                 return NotFound();
@@ -119,7 +185,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetAnimeFigure(int id)
         {
 
-            AnimeFigure? animeFigure = await dbContext?.AnimeFigures?.SingleOrDefaultAsync(f => f.Id == id);
+            AnimeFigure? animeFigure = await dbDataContext?.AnimeFigures?.SingleOrDefaultAsync(f => f.Id == id);
 
             if (animeFigure == null)
                 return BadRequest("Invalid anime figure id.");
@@ -150,7 +216,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetTypes()
         {
 
-            return Ok(dbContext?.Types);
+            return Ok(dbDataContext?.Types);
 
         }
 
@@ -158,7 +224,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetType(int id)
         {
 
-            EntityModels.Type? type = await dbContext?.Types?.FirstOrDefaultAsync(t => t.Id == id);
+            EntityModels.Type? type = await dbDataContext?.Types?.FirstOrDefaultAsync(t => t.Id == id);
 
             if (type == null)
                 return NotFound();
@@ -189,7 +255,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetBrands()
         {
 
-            return Ok(dbContext?.Brands);
+            return Ok(dbDataContext?.Brands);
 
         }
 
@@ -197,7 +263,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetBrand(int id)
         {
 
-            Brand? brand = await dbContext?.Brands?.FirstOrDefaultAsync(b => b.Id == id);
+            Brand? brand = await dbDataContext?.Brands?.FirstOrDefaultAsync(b => b.Id == id);
 
             if (brand == null)
                 return NotFound();
@@ -228,7 +294,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetOrigins()
         {
 
-            return Ok(dbContext?.Origins);
+            return Ok(dbDataContext?.Origins);
 
         }
 
@@ -236,7 +302,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetOrigin(int id)
         {
 
-            Origin origin = await dbContext?.Origins?.FirstOrDefaultAsync(o => o.Id == id);
+            Origin origin = await dbDataContext?.Origins?.FirstOrDefaultAsync(o => o.Id == id);
 
             if (origin == null)
                 return NotFound();
@@ -267,7 +333,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetCategories()
         {
 
-            return Ok(dbContext?.Categories);
+            return Ok(dbDataContext?.Categories);
 
         }
 
@@ -275,7 +341,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetCategory(int id)
         {
 
-            Category category = await dbContext?.Categories?.FirstOrDefaultAsync(c => c.Id == id);
+            Category category = await dbDataContext?.Categories?.FirstOrDefaultAsync(c => c.Id == id);
 
             if (category == null)
                 return NotFound();
@@ -306,7 +372,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetReviews()
         {
 
-            return Ok(dbContext?.Reviews);
+            return Ok(dbDataContext?.Reviews);
 
         }
 
@@ -314,7 +380,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetReview(int id)
         {
 
-            Review review = await dbContext?.Reviews?.FirstOrDefaultAsync(r => r.Id == id);
+            Review review = await dbDataContext?.Reviews?.FirstOrDefaultAsync(r => r.Id == id);
 
             if (review == null)
                 return NotFound();
@@ -360,9 +426,10 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            List<Collection> collections = await dbContext?.Collections.Where(c => c.Collectors != null && c.Collectors.Any(c => c.Id == int.Parse(userId))).Include(c => c.AnimeFigures).Include(c => c.Collectors).ToListAsync();
+            List<Collection> collections = await dbDataContext?.Collections.Include(c => c.AnimeFigures).Include(c => c.Collectors).ToListAsync();
+            List<Collection> filteredCollections = collections.Where(c => c.Collectors != null && c.Collectors.Any(collector => collector.AuthenticationUserId == userId)).ToList();
 
-            return Ok(collections);
+            return Ok(filteredCollections);
 
         }
 
@@ -376,7 +443,7 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            Collection collection = await dbContext?.Collections.FirstOrDefaultAsync(c => c.Id == id && c.Collectors.Any(c => c.Id == int.Parse(userId)));
+            Collection collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.Collectors.Any(c => c.AuthenticationUserId == userId));
 
             if (collection == null)
                 return NotFound();
@@ -401,13 +468,13 @@ namespace AnimeFigureProject.Api.Controllers
                 Name = name,
                 TotalPrice = 0,
                 TotalValue = 0,
-                OwnerId = int.Parse(userId),
+                OwnerId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id,
                 AnimeFigures = new List<AnimeFigure>()
 
             };
 
-            dbContext?.Collections?.AddAsync(collection);
-            await dbContext?.SaveChangesAsync();
+            dbDataContext?.Collections?.AddAsync(collection);
+            await dbDataContext?.SaveChangesAsync();
 
             return Ok();
 
@@ -423,13 +490,14 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            Collection? collection = await dbContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == int.Parse(userId));
+            int currentUserId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id;
+            Collection? collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == currentUserId);
 
             if (collection == null)
                 return NotFound();
 
             collection.Name = name;
-            dbContext.SaveChanges();
+            dbDataContext.SaveChanges();
 
             return Ok();
 
@@ -463,13 +531,14 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            Collection? collection = await dbContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == int.Parse(userId));
+            int currentUserId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id;
+            Collection? collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == currentUserId);
 
             if (collection == null)
                 return NotFound();
 
-            dbContext?.Collections?.Remove(collection);
-            await dbContext?.SaveChangesAsync();
+            dbDataContext?.Collections?.Remove(collection);
+            await dbDataContext?.SaveChangesAsync();
 
             return Ok();
 
