@@ -1,0 +1,41 @@
+﻿.CreateBox
+{
+
+    border: 1px solid #000000;
+
+    margin-top: 2%;
+
+    height: 80vh;
+
+}
+
+#Choosen button
+{
+
+    margin-top: 2%;
+    margin-right: 1%;
+
+}
+
+#SubCreateBox
+{
+
+    margin-left: 50%;
+    padding-top: 1%;
+
+    width: 100%;
+
+}
+
+
+#CreateBoxButtons 
+{
+
+    display: inline-block;
+    position: relative;
+
+    margin-top: 25%;
+
+    width: 100%;
+
+}

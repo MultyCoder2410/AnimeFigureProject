@@ -245,6 +245,21 @@ namespace AnimeFigureProject.DatabaseAccess
         }
 
         /// <summary>
+        /// Gets all types specified in id list.
+        /// </summary>
+        /// <param name="ids">Ids of specific types</param>
+        /// <returns>List of types with id's from id list</returns>
+        public async Task<List<EntityModels.Type>?> GetTypes(int[] ids)
+        {
+
+            if (applicationContext?.Types == null)
+                return null;
+
+            return await applicationContext.Types.Where(t => ids.Contains(t.Id)).ToListAsync();
+
+        }
+
+        /// <summary>
         /// Gets specific type.
         /// </summary>
         /// <param name="id">Id of specific type</param>
@@ -256,6 +271,21 @@ namespace AnimeFigureProject.DatabaseAccess
                 return null;
 
             return await applicationContext.Types.FirstOrDefaultAsync(t => t.Id == id);
+
+        }
+
+        /// <summary>
+        /// Gets specific type.
+        /// </summary>
+        /// <param name="name">Name of specific type</param>
+        /// <returns>Specific type</returns>
+        public async Task<EntityModels.Type?> GetType(string name)
+        {
+
+            if (applicationContext?.Types == null)
+                return null;
+
+            return await applicationContext.Types.FirstOrDefaultAsync(t => t.Name == name);
 
         }
 
@@ -314,6 +344,21 @@ namespace AnimeFigureProject.DatabaseAccess
         }
 
         /// <summary>
+        /// Gets all brands specified in id list.
+        /// </summary>
+        /// <param name="ids">Ids of specific brands</param>
+        /// <returns>List of brands with id's from id list</returns>
+        public async Task<List<Brand>?> GetBrands(int[] ids)
+        {
+
+            if (applicationContext?.Brands == null)
+                return null;
+
+            return await applicationContext.Brands.Where(b => ids.Contains(b.Id)).ToListAsync();
+
+        }
+
+        /// <summary>
         /// Gets specific brand.
         /// </summary>
         /// <param name="id">Id of specific brand</param>
@@ -324,7 +369,22 @@ namespace AnimeFigureProject.DatabaseAccess
             if (applicationContext?.Brands == null)
                 return null;
 
-            return await applicationContext.Brands.FirstOrDefaultAsync(t => t.Id == id);
+            return await applicationContext.Brands.FirstOrDefaultAsync(b => b.Id == id);
+
+        }
+
+        /// <summary>
+        /// Gets specific brand.
+        /// </summary>
+        /// <param name="name">Name of specific brand</param>
+        /// <returns>Specific brand</returns>
+        public async Task<Brand?> GetBrand(string name)
+        {
+
+            if (applicationContext?.Brands == null)
+                return null;
+
+            return await applicationContext.Brands.FirstOrDefaultAsync(b => b.Name == name);
 
         }
 
@@ -383,6 +443,21 @@ namespace AnimeFigureProject.DatabaseAccess
         }
 
         /// <summary>
+        /// Gets all origins specified in id list.
+        /// </summary>
+        /// <param name="ids">Ids of specific origins</param>
+        /// <returns>List of origins with id's from id list</returns>
+        public async Task<List<Origin>?> GetOrigins(int[] ids)
+        {
+
+            if (applicationContext?.Origins == null)
+                return null;
+
+            return await applicationContext.Origins.Where(o => ids.Contains(o.Id)).ToListAsync();
+
+        }
+
+        /// <summary>
         /// Gets specific origin.
         /// </summary>
         /// <param name="id">Id of specific origin</param>
@@ -393,7 +468,22 @@ namespace AnimeFigureProject.DatabaseAccess
             if (applicationContext?.Origins == null)
                 return null;
 
-            return await applicationContext.Origins.FirstOrDefaultAsync(t => t.Id == id);
+            return await applicationContext.Origins.FirstOrDefaultAsync(o => o.Id == id);
+
+        }
+
+        /// <summary>
+        /// Gets specific origin.
+        /// </summary>
+        /// <param name="name">Name of specific origin</param>
+        /// <returns>Specific origin</returns>
+        public async Task<Origin?> GetOrigin(string name)
+        {
+
+            if (applicationContext?.Origins == null)
+                return null;
+
+            return await applicationContext.Origins.FirstOrDefaultAsync(o => o.Name == name);
 
         }
 

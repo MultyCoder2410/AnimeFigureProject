@@ -1,4 +1,5 @@
-﻿using AnimeFigureProject.WebApp.Models;
+﻿using AnimeFigureProject.DatabaseAccess;
+using AnimeFigureProject.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -8,11 +9,13 @@ namespace AnimeFigureProject.WebApp.Controllers
     {
 
         private readonly ILogger<HomeController> logger;
+        private readonly DataAccessService dataAccessService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, DataAccessService dataAccessService)
         {
 
             this.logger = logger;
+            this.dataAccessService = dataAccessService;
 
         }
 
@@ -22,15 +25,13 @@ namespace AnimeFigureProject.WebApp.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+        
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
         }
+
     }
 }

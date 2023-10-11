@@ -1,0 +1,166 @@
+﻿@using AnimeFigureProject.EntityModels;
+@model AnimeFigureProject.WebApp.Models.AllAnimeFiguresModel
+@{
+    ViewData["Title"] = "Catalog";
+}
+
+<link rel="stylesheet" href="~/css/MainCatalog.css" asp-append-version="true" />
+
+<div class="SearchBar">
+
+    <input type="text" id="SearchbarInput" name="MainSearchbar" placeholder="Search">
+
+    <div class="FilterDropdown">
+
+        <input type="button" class="btn btn-primary DropdownButton" value="Filter">
+
+        <div class="DropdownContent">
+
+            <div class="DropdownSubContent">
+
+                <div class="DropDownCategory" id="Type">
+
+                    <p>Type</p>
+
+                    <hr>
+
+                    @foreach (AnimeFigureProject.EntityModels.Type type in Model.Types)
+                    {
+
+                        <div>
+
+                            <input id="@type.Id" type="checkbox" />
+                            <label>@type.Name</label>
+
+                        </div>
+
+                    }
+
+                </div>
+
+                <div class="DropDownCategory" id="Brand">
+
+                    <p>Brand</p>
+
+                    <hr>
+
+                    @foreach (Brand brand in Model.Brands)
+                    {
+
+                        <div>
+
+                            <input id="@brand.Id" type="checkbox"/>
+                            <label>@brand.Name</label>
+
+                        </div>
+
+                    }
+
+                </div>
+
+                <div class="DropDownCategory" id="Origin">
+
+                    <p>Origin</p>
+
+                    <hr>
+
+                    @foreach (Origin origin in Model.Origins)
+                    {
+
+                        <div>
+
+                            <input id="@origin.Id" type="checkbox" />
+                            <label>@origin.Name</label>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="VerticalDiv">
+
+        <a asp-action="Create">
+            <input type="button" class="btn btn-primary" value="Add figure">
+        </a>
+
+    </div>
+
+</div>
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.AnimeFigures[0].Name)
+            </th>
+            
+            <th>
+                Type name
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.AnimeFigures[0].Price)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.AnimeFigures[0].Value)
+            </th>
+            
+            <th></th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model.AnimeFigures) 
+        {
+
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+
+                @if (item.Type != null)
+                {
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type.Name)
+                    </td>
+
+                }
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+
+            </tr>
+
+        }
+
+    </tbody>
+
+</table>
+
+<script src="~/js/MainCatelog.js"></script>
