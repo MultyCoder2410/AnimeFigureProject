@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnimeFigureProject.EntityModels\AnimeFigureProject.EntityModels.csproj" />
+    <ProjectReference Include="..\AnimeFigureProject.DatabaseAccess\AnimeFigureProject.DatabaseAccess.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,4 @@
-﻿using AnimeFigureProject.EntityModels;
-using AnimeFigureProject.WebApp.Data;
-using AnimeFigureProject.WebApp.Models;
+﻿using AnimeFigureProject.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -10,22 +8,18 @@ namespace AnimeFigureProject.WebApp.Controllers
     {
 
         private readonly ILogger<HomeController> logger;
-        private readonly ApiService apiService;
 
-        public HomeController(ILogger<HomeController> logger, ApiService apiService)
+        public HomeController(ILogger<HomeController> logger)
         {
 
             this.logger = logger;
-            this.apiService = apiService;
 
         }
 
         public async Task<IActionResult> Index()
         {
 
-            AnimeFigure animeFigure = await apiService.GetAnimeFigure(1);
-
-            return View(animeFigure);
+            return View();
         }
 
         public IActionResult Privacy()

@@ -1,7 +1,7 @@
-using AnimeFigureProject.WebApp.Data;
+using AnimeFigureProject.DatabaseContext.Authentication;
+using AnimeFigureProject.DatabaseContext.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
 
 namespace AnimeFigureProject.WebApp
 {
@@ -12,23 +12,17 @@ namespace AnimeFigureProject.WebApp
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            var dataConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var securityConnectionString = builder.Configuration.GetConnectionString("SecurityConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            builder.Services.AddProgramContext(dataConnectionString);
+            builder.Services.AddSecurityContext(securityConnectionString);
+
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<SecurityDbContext>();
             builder.Services.AddControllersWithViews();
-
-            builder.Services.AddHttpClient<ApiService>(client => 
-            {
-
-                client.BaseAddress = new Uri("https://localhost:7217/");
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            
-            });
 
             var app = builder.Build();
 

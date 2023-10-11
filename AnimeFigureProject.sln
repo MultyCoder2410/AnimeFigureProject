@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeFigureProject.Api", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeFigureProject.DatabaseContext", "AnimeFigureProject.DatabaseContext\AnimeFigureProject.DatabaseContext.csproj", "{B2D15C4B-F279-4048-8CB3-CC42D2807CB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeFigureProject.WebApp", "AnimeFigureProject.WebApp\AnimeFigureProject.WebApp.csproj", "{73B23782-ADC9-4A5A-AE7C-DCF2548880D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimeFigureProject.WebApp", "AnimeFigureProject.WebApp\AnimeFigureProject.WebApp.csproj", "{73B23782-ADC9-4A5A-AE7C-DCF2548880D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeFigureProject.DatabaseAccess", "AnimeFigureProject.DatabaseAccess\AnimeFigureProject.DatabaseAccess.csproj", "{71366AD5-829A-4C07-BC2F-06D58F1BF8A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{73B23782-ADC9-4A5A-AE7C-DCF2548880D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73B23782-ADC9-4A5A-AE7C-DCF2548880D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73B23782-ADC9-4A5A-AE7C-DCF2548880D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71366AD5-829A-4C07-BC2F-06D58F1BF8A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71366AD5-829A-4C07-BC2F-06D58F1BF8A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71366AD5-829A-4C07-BC2F-06D58F1BF8A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71366AD5-829A-4C07-BC2F-06D58F1BF8A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

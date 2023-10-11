@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using AnimeFigureProject.EntityModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using AnimeFigureProject.DatabaseContext.Data;
-using AnimeFigureProject.DatabaseContext.Authentication;
+using AnimeFigureProject.DatabaseAccess;
 
 namespace AnimeFigureProject.Api.Controllers
 {
 
+    /// <summary>
+    /// Api for accessing anime figure data and user specific data.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AnimeFigureController : ControllerBase
@@ -17,16 +18,20 @@ namespace AnimeFigureProject.Api.Controllers
 
         private readonly UserManager<IdentityUser>? userManager;
         private readonly SignInManager<IdentityUser>? signInManager;
-        private readonly ApplicationDbContext? dbDataContext;
-        private readonly SecurityDbContext? dbSecurityContext;
+        private readonly DataAccessService? dataAccessService;
 
-        public AnimeFigureController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbDataContext, SecurityDbContext dbSecurityContext)
+        /// <summary>
+        /// Creates anime figure controller
+        /// </summary>
+        /// <param name="userManager">Used for creating and deleting users</param>
+        /// <param name="signInManager">Used for loggin in and out</param>
+        /// <param name="dataAccessService">Used for accessing the database</param>
+        public AnimeFigureController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, DataAccessService dataAccessService)
         {
 
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.dbDataContext = dbDataContext;
-            this.dbSecurityContext = dbSecurityContext;
+            this.dataAccessService = dataAccessService;
 
         }
 
@@ -69,13 +74,18 @@ namespace AnimeFigureProject.Api.Controllers
 
             };
 
-            dbDataContext?.Collectors?.Add(newCollector);
-            await dbDataContext?.SaveChangesAsync();
+            dataAccessService?.CreateCollector(newCollector);
 
             return Ok("Registration successful");
 
         }
 
+        /// <summary>
+        /// Login to API with user.
+        /// </summary>
+        /// <param name="email">Mail address of user</param>
+        /// <param name="password">Password of user</param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login(string email, string password)
         {
@@ -113,6 +123,10 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        /// <summary>
+        /// Deletes user account
+        /// </summary>
+        /// <returns>Was able to delete user</returns>
         [Authorize]
         [HttpDelete("account")]
         public async Task<IActionResult> DeleteAccount()
@@ -125,7 +139,11 @@ namespace AnimeFigureProject.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: signInManager is null.");
 
             IdentityUser? user = await userManager.GetUserAsync(User);
-            string? userId = user?.Id;
+
+            if (user == null)
+                return NotFound("No user was found to delete.");
+
+            string userId = user.Id;
 
             await signInManager.SignOutAsync();
             IdentityResult result = await userManager.DeleteAsync(user);
@@ -133,64 +151,60 @@ namespace AnimeFigureProject.Api.Controllers
             if (!result.Succeeded)
                 return BadRequest("\"Failed to delete account. Details: " + result.Errors.ToString());
 
-            dbDataContext?.Collectors?.Remove(dbDataContext.Collectors.FirstOrDefault(c => c.AuthenticationUserId == userId));
-            await dbDataContext?.SaveChangesAsync();
+            dataAccessService?.DeleteCollector(dataAccessService.GetCollector(userId).Id);
 
             return Ok("Deleted account.");
 
         }
 
-        // GET: api/<AnimeFigureController>
+        /// <summary>
+        /// Gets all anime figures stored in database
+        /// </summary>
+        /// <returns>List of all anime figures in database</returns>
         [HttpGet("animefigures")]
         public IActionResult GetAnimeFigures()
         {
 
-            return Ok(dbDataContext?.AnimeFigures);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            return Ok(dataAccessService?.GetAllAnimeFigures());
 
         }
 
+        /// <summary>
+        /// Gets all anime figures stored in database based on filters.
+        /// </summary>
+        /// <param name="searchTerm">Anime figure must contain in name</param>
+        /// <param name="brandIds">The brands that you want to see the anime figure from.</param>
+        /// <param name="TypeIds">The types of anime figures you want to see</param>
+        /// <param name="originIds">The origins of the anime figures you want to see</param>
+        /// <returns>List of filtered anime figures</returns>
         [HttpGet("filteredanimefigures")]
         public IActionResult GetFilteredAnimeFigures(string? searchTerm, [FromQuery] int[]? brandIds, [FromQuery] int[]? TypeIds, [FromQuery] int[]? originIds)
         {
 
-            IQueryable<AnimeFigure> animeFigures = dbDataContext?.AnimeFigures;
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (animeFigures == null)
-                return NotFound();
-
-            if (!string.IsNullOrEmpty(searchTerm))
-                animeFigures = animeFigures.Where(f => f.Name != null && f.Name.Contains(searchTerm));
-
-            if (brandIds != null && brandIds.Length > 0)
-                animeFigures = animeFigures.Where(f => f.Brand != null && brandIds.Contains(f.Brand.Id));
-
-            if (TypeIds != null && TypeIds.Length > 0)
-                animeFigures = animeFigures.Where(f => f.Type != null && TypeIds.Contains(f.Type.Id));
-
-            if (originIds != null && originIds.Length > 0)
-            {
-
-                var filteredFigures = animeFigures.Include(f => f.Origins).AsEnumerable().Where(f => f.Origins != null && f.Origins.Any(origin => originIds.Contains(origin.Id))).Select(f => f.Id);
-                animeFigures = animeFigures.Where(f => filteredFigures.Contains(f.Id));
-
-            }
-
-            return Ok(animeFigures);
+            return Ok(dataAccessService.GetFilteredAnimeFigures(searchTerm, brandIds, TypeIds, originIds));
 
         }
 
 
-        // GET api/<AnimeFigureController>/5
+        /// <summary>
+        /// Gets specific anime figure.
+        /// </summary>
+        /// <param name="id">Id of anime figure</param>
+        /// <returns>Anime figure which has the given id</returns>
         [HttpGet("animefigure/{id}")]
         public async Task<IActionResult> GetAnimeFigure(int id)
         {
 
-            AnimeFigure? animeFigure = await dbDataContext?.AnimeFigures?.SingleOrDefaultAsync(f => f.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (animeFigure == null)
-                return BadRequest("Invalid anime figure id.");
-
-            return Ok(animeFigure);
+            return Ok(await dataAccessService.GetAnimeFigure(id));
 
         }
 
@@ -216,7 +230,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetTypes()
         {
 
-            return Ok(dbDataContext?.Types);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            return Ok(await dataAccessService.GetTypes());
 
         }
 
@@ -224,12 +241,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetType(int id)
         {
 
-            EntityModels.Type? type = await dbDataContext?.Types?.FirstOrDefaultAsync(t => t.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (type == null)
-                return NotFound();
-
-            return Ok(type);
+            return Ok(await dataAccessService.GetType(id));
 
         }
 
@@ -255,7 +270,7 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetBrands()
         {
 
-            return Ok(dbDataContext?.Brands);
+            return Ok(await dataAccessService?.GetBrands());
 
         }
 
@@ -263,12 +278,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetBrand(int id)
         {
 
-            Brand? brand = await dbDataContext?.Brands?.FirstOrDefaultAsync(b => b.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (brand == null)
-                return NotFound();
-
-            return Ok(brand);
+            return Ok(await dataAccessService.GetBrand(id));
 
         }
 
@@ -294,7 +307,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetOrigins()
         {
 
-            return Ok(dbDataContext?.Origins);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            return Ok(await dataAccessService.GetOrigins());
 
         }
 
@@ -302,12 +318,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetOrigin(int id)
         {
 
-            Origin origin = await dbDataContext?.Origins?.FirstOrDefaultAsync(o => o.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (origin == null)
-                return NotFound();
-
-            return Ok(origin);
+            return Ok(await dataAccessService.GetOrigin(id));
 
         }
         
@@ -333,7 +347,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetCategories()
         {
 
-            return Ok(dbDataContext?.Categories);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            return Ok(await dataAccessService.GetCategories());
 
         }
 
@@ -341,12 +358,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetCategory(int id)
         {
 
-            Category category = await dbDataContext?.Categories?.FirstOrDefaultAsync(c => c.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (category == null)
-                return NotFound();
-
-            return Ok(category);
+            return Ok(await dataAccessService.GetCategory(id));
 
         }
 
@@ -372,7 +387,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetReviews()
         {
 
-            return Ok(dbDataContext?.Reviews);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            return Ok(await dataAccessService.GetReviews());
 
         }
 
@@ -380,12 +398,10 @@ namespace AnimeFigureProject.Api.Controllers
         public async Task<IActionResult> GetReview(int id)
         {
 
-            Review review = await dbDataContext?.Reviews?.FirstOrDefaultAsync(r => r.Id == id);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (review == null)
-                return NotFound();
-
-            return Ok(review);
+            return Ok(await dataAccessService.GetReview(id));
 
         }
 
@@ -416,6 +432,10 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        /// <summary>
+        /// Gets all collections of user.
+        /// </summary>
+        /// <returns>All collections from user</returns>
         [Authorize]
         [HttpGet("collections")]
         public async Task<IActionResult> GetCollections()
@@ -426,13 +446,18 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            List<Collection> collections = await dbDataContext?.Collections.Include(c => c.AnimeFigures).Include(c => c.Collectors).ToListAsync();
-            List<Collection> filteredCollections = collections.Where(c => c.Collectors != null && c.Collectors.Any(collector => collector.AuthenticationUserId == userId)).ToList();
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            return Ok(filteredCollections);
+            return Ok(await dataAccessService.GetCollections(userId));
 
         }
 
+        /// <summary>
+        /// Gets specific collection from user.
+        /// </summary>
+        /// <param name="id">Id of collection</param>
+        /// <returns>Specifik collection from user</returns>
         [Authorize]
         [HttpGet("collection")]
         public async Task<IActionResult> GetCollection(int id)
@@ -443,12 +468,10 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            Collection collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.Collectors.Any(c => c.AuthenticationUserId == userId));
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (collection == null)
-                return NotFound();
-
-            return Ok(collection);
+            return Ok(await dataAccessService.GetCollection(id, userId));
 
         }
 
@@ -462,24 +485,30 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
             Collection collection = new Collection
             {
 
                 Name = name,
                 TotalPrice = 0,
                 TotalValue = 0,
-                OwnerId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id,
+                OwnerId = dataAccessService.GetCollector(userId).Id,
                 AnimeFigures = new List<AnimeFigure>()
 
             };
 
-            dbDataContext?.Collections?.AddAsync(collection);
-            await dbDataContext?.SaveChangesAsync();
-
-            return Ok();
+            return Ok(await dataAccessService.CreateCollection(collection));
 
         }
 
+        /// <summary>
+        /// Updates collection name of collection from current user.
+        /// </summary>
+        /// <param name="id">Id of the choosen collection</param>
+        /// <param name="name">New name of collection</param>
+        /// <returns>Update of collection was succesfull</returns>
         [Authorize]
         [HttpPut("collection/{id}")]
         public async Task<IActionResult> PutCollection(int id, string name)
@@ -490,16 +519,17 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            int currentUserId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id;
-            Collection? collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == currentUserId);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
+
+            Collection? collection = await dataAccessService.GetCollection(id, userId);
 
             if (collection == null)
-                return NotFound();
+                return NotFound("Could not find collection");
 
             collection.Name = name;
-            dbDataContext.SaveChanges();
 
-            return Ok();
+            return Ok(dataAccessService.UpdateCollection(collection));
 
         }
 
@@ -521,6 +551,11 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
+        /// <summary>
+        /// Deletes collection from logged in user.
+        /// </summary>
+        /// <param name="id">The collection id which needs to be deleted</param>
+        /// <returns>Was deletion succesfull</returns>
         [Authorize]
         [HttpDelete("collection/{id}")]
         public async Task<IActionResult> DeleteCollection(int id)
@@ -531,16 +566,12 @@ namespace AnimeFigureProject.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("No user was found.");
 
-            int currentUserId = (await dbDataContext?.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == userId)).Id;
-            Collection? collection = await dbDataContext?.Collections?.FirstOrDefaultAsync(c => c.Id == id && c.OwnerId == currentUserId);
+            if (dataAccessService == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error: dataAccessService is null.");
 
-            if (collection == null)
-                return NotFound();
+            await dataAccessService.DeleteCollection(id, userId);
 
-            dbDataContext?.Collections?.Remove(collection);
-            await dbDataContext?.SaveChangesAsync();
-
-            return Ok();
+            return Ok("Deleted collection");
 
         }
 
