@@ -22,21 +22,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AnimeFigureCategory", b =>
-                {
-                    b.Property<int>("AnimeFiguresId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AnimeFiguresId", "CategoriesId");
-
-                    b.HasIndex("CategoriesId");
-
-                    b.ToTable("AnimeFigureCategory");
-                });
-
             modelBuilder.Entity("AnimeFigureOrigin", b =>
                 {
                     b.Property<int>("AnimeFiguresId")
@@ -63,8 +48,14 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                     b.Property<int?>("BrandId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CollectionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageFolderPath")
                         .HasColumnType("nvarchar(max)");
@@ -75,19 +66,19 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(10, 2)");
 
-                    b.Property<int?>("TypeId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("Value")
                         .HasColumnType("decimal(10, 2)");
+
+                    b.Property<int?>("YearOfRelease")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
-                    b.HasIndex("CollectionId");
+                    b.HasIndex("CategoryId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("CollectionId");
 
                     b.ToTable("AnimeFigures");
                 });
@@ -210,22 +201,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("AnimeFigureProject.EntityModels.Type", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Types");
-                });
-
             modelBuilder.Entity("CollectionCollector", b =>
                 {
                     b.Property<int>("CollectionsId")
@@ -239,21 +214,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                     b.HasIndex("CollectorsId");
 
                     b.ToTable("CollectionCollector");
-                });
-
-            modelBuilder.Entity("AnimeFigureCategory", b =>
-                {
-                    b.HasOne("AnimeFigureProject.EntityModels.AnimeFigure", null)
-                        .WithMany()
-                        .HasForeignKey("AnimeFiguresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AnimeFigureProject.EntityModels.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AnimeFigureOrigin", b =>
@@ -277,17 +237,17 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                         .WithMany("AnimeFigures")
                         .HasForeignKey("BrandId");
 
+                    b.HasOne("AnimeFigureProject.EntityModels.Category", "Category")
+                        .WithMany("AnimeFigures")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("AnimeFigureProject.EntityModels.Collection", null)
                         .WithMany("AnimeFigures")
                         .HasForeignKey("CollectionId");
 
-                    b.HasOne("AnimeFigureProject.EntityModels.Type", "Type")
-                        .WithMany("AnimeFigures")
-                        .HasForeignKey("TypeId");
-
                     b.Navigation("Brand");
 
-                    b.Navigation("Type");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("AnimeFigureProject.EntityModels.Review", b =>
@@ -330,12 +290,12 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                     b.Navigation("AnimeFigures");
                 });
 
-            modelBuilder.Entity("AnimeFigureProject.EntityModels.Collection", b =>
+            modelBuilder.Entity("AnimeFigureProject.EntityModels.Category", b =>
                 {
                     b.Navigation("AnimeFigures");
                 });
 
-            modelBuilder.Entity("AnimeFigureProject.EntityModels.Type", b =>
+            modelBuilder.Entity("AnimeFigureProject.EntityModels.Collection", b =>
                 {
                     b.Navigation("AnimeFigures");
                 });

@@ -75,7 +75,7 @@ namespace AnimeFigureWebApp.Controllers
 
                 AnimeFigures: animeFigures,
                 Brands: await dataAccessService.GetBrands(),
-                Types: await dataAccessService.GetTypes(),
+                Categories: await dataAccessService.GetCategories(),
                 Origins: await dataAccessService.GetOrigins()
 
             );
@@ -112,7 +112,7 @@ namespace AnimeFigureWebApp.Controllers
 
                 NewAnimeFigure: new AnimeFigure(),
                 Brands: await dataAccessService.GetBrands(),
-                Types: await dataAccessService.GetTypes(),
+                Categories: await dataAccessService.GetCategories(),
                 Origins: await dataAccessService.GetOrigins()
 
             );
@@ -130,7 +130,7 @@ namespace AnimeFigureWebApp.Controllers
         /// <returns>View of NewFigureModel or redirection to Index page</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AnimeFigure animeFigure, string brandName, string typeName, string selectedOrigins)
+        public async Task<IActionResult> Create(AnimeFigure animeFigure, string brandName, string categoryName, string selectedOrigins)
         {
 
             if (ModelState.IsValid)
@@ -139,7 +139,7 @@ namespace AnimeFigureWebApp.Controllers
                 string[] allSelectedOrigins = selectedOrigins.Split(",");
 
                 animeFigure.Brand = await dataAccessService.GetBrand(brandName);
-                animeFigure.Type = await dataAccessService.GetType(typeName);
+                animeFigure.Category = await dataAccessService.GetCategory(categoryName);
                 animeFigure.Origins = await dataAccessService.GetOrigins(Array.ConvertAll(allSelectedOrigins, int.Parse));
 
                 await dataAccessService.CreateAnimeFigure(animeFigure);
@@ -152,7 +152,7 @@ namespace AnimeFigureWebApp.Controllers
 
                 NewAnimeFigure: animeFigure,
                 Brands: await dataAccessService.GetBrands(),
-                Types: await dataAccessService.GetTypes(),
+                Categories: await dataAccessService.GetCategories(),
                 Origins: await dataAccessService.GetOrigins()
 
             );

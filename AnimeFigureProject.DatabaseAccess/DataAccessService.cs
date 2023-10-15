@@ -143,7 +143,7 @@ namespace AnimeFigureProject.DatabaseAccess
         /// <param name="TypeIds">The types that you want to see the anime figures from</param>
         /// <param name="originIds">The origins that you want to see the anime figures from</param>
         /// <returns>List of filtered anime figures</returns>
-        public async Task<List<AnimeFigure>?> GetFilteredAnimeFigures(string? searchTerm, int[]? brandIds, int[]? TypeIds, int[]? originIds)
+        public async Task<List<AnimeFigure>?> GetFilteredAnimeFigures(string? searchTerm, int[]? brandIds, int[]? CategoryIds, int[]? originIds)
         {
 
             if (applicationContext?.AnimeFigures == null)
@@ -160,8 +160,8 @@ namespace AnimeFigureProject.DatabaseAccess
             if (brandIds != null && brandIds.Length > 0)
                 animeFigures = animeFigures.Where(f => f.Brand != null && brandIds.Contains(f.Brand.Id));
 
-            if (TypeIds != null && TypeIds.Length > 0)
-                animeFigures = animeFigures.Where(f => f.Type != null && TypeIds.Contains(f.Type.Id));
+            if (CategoryIds != null && CategoryIds.Length > 0)
+                animeFigures = animeFigures.Where(f => f.Category != null && CategoryIds.Contains(f.Category.Id));
 
             if (originIds != null && originIds.Length > 0)
             {
@@ -223,105 +223,6 @@ namespace AnimeFigureProject.DatabaseAccess
             await applicationContext.SaveChangesAsync();
 
             return animeFigure;
-
-        }
-
-        #endregion
-
-        #region Type
-
-        /// <summary>
-        /// Gets all types in database.
-        /// </summary>
-        /// <returns>List of types in database</returns>
-        public async Task<List<EntityModels.Type>?> GetTypes()
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            return await applicationContext.Types.ToListAsync();
-
-        }
-
-        /// <summary>
-        /// Gets all types specified in id list.
-        /// </summary>
-        /// <param name="ids">Ids of specific types</param>
-        /// <returns>List of types with id's from id list</returns>
-        public async Task<List<EntityModels.Type>?> GetTypes(int[] ids)
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            return await applicationContext.Types.Where(t => ids.Contains(t.Id)).ToListAsync();
-
-        }
-
-        /// <summary>
-        /// Gets specific type.
-        /// </summary>
-        /// <param name="id">Id of specific type</param>
-        /// <returns>Specific type</returns>
-        public async Task<EntityModels.Type?> GetType(int id)
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            return await applicationContext.Types.FirstOrDefaultAsync(t => t.Id == id);
-
-        }
-
-        /// <summary>
-        /// Gets specific type.
-        /// </summary>
-        /// <param name="name">Name of specific type</param>
-        /// <returns>Specific type</returns>
-        public async Task<EntityModels.Type?> GetType(string name)
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            return await applicationContext.Types.FirstOrDefaultAsync(t => t.Name == name);
-
-        }
-
-        /// <summary>
-        /// Creates new type.
-        /// </summary>
-        /// <param name="type">The new type to create</param>
-        /// <returns>New type that was created</returns>
-        public async Task<EntityModels.Type?> CreateType(EntityModels.Type type)
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            applicationContext.Types?.AddAsync(type);
-            await applicationContext.SaveChangesAsync();
-
-            return type;
-
-        }
-
-        /// <summary>
-        /// Updates type data.
-        /// </summary>
-        /// <param name="type">The update type</param>
-        /// <returns>The update type</returns>
-        public async Task<EntityModels.Type?> UpdateType(EntityModels.Type type)
-        {
-
-            if (applicationContext?.Types == null)
-                return null;
-
-            applicationContext.Types.Update(type);
-            await applicationContext.SaveChangesAsync();
-
-            return type;
 
         }
 
@@ -552,7 +453,22 @@ namespace AnimeFigureProject.DatabaseAccess
             if (applicationContext?.Categories == null)
                 return null;
 
-            return await applicationContext.Categories.FirstOrDefaultAsync(t => t.Id == id);
+            return await applicationContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+
+        }
+
+        /// <summary>
+        /// Gets specific category.
+        /// </summary>
+        /// <param name="name">Name of specific category</param>
+        /// <returns>Specific category</returns>
+        public async Task<Category?> GetCategory(string name)
+        {
+
+            if (applicationContext?.Categories == null)
+                return null;
+
+            return await applicationContext.Categories.FirstOrDefaultAsync(c => c.Name == name);
 
         }
 

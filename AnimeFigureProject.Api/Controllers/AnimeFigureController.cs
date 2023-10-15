@@ -34,7 +34,7 @@ namespace AnimeFigureProject.Api.Controllers
             this.dataAccessService = dataAccessService;
 
         }
-
+        /*
         /// <summary>
         /// Registers a new user to the database.
         /// </summary>
@@ -574,6 +574,6 @@ namespace AnimeFigureProject.Api.Controllers
             return Ok("Deleted collection");
 
         }
-
+        */
     }
 }

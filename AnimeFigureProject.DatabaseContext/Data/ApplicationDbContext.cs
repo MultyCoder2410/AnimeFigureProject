@@ -15,7 +15,6 @@ namespace AnimeFigureProject.DatabaseContext.Data
         public DbSet<Collector>? Collectors { get; set; }
         public DbSet<Origin>? Origins { get; set; }
         public DbSet<Review>? Reviews { get; set; }
-        public DbSet<EntityModels.Type>? Types { get; set; }
 
         public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }

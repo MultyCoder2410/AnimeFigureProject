@@ -6,7 +6,7 @@ public record AllAnimeFiguresModel
 (
 
     IList<AnimeFigure>? AnimeFigures,
-    IList<EntityModels.Type>? Types,
+    IList<Category>? Categories,
     IList<Brand>? Brands,
     IList<Origin>? Origins
 

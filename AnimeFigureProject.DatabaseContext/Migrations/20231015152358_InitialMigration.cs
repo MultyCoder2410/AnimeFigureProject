@@ -80,16 +80,39 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Types",
+                name: "AnimeFigures",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    Value = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    BrandId = table.Column<int>(type: "int", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    YearOfRelease = table.Column<int>(type: "int", nullable: true),
+                    ImageFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CollectionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Types", x => x.Id);
+                    table.PrimaryKey("PK_AnimeFigures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnimeFigures_Brands_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "Brands",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AnimeFigures_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AnimeFigures_Collections_CollectionId",
+                        column: x => x.CollectionId,
+                        principalTable: "Collections",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -112,64 +135,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                         name: "FK_CollectionCollector_Collectors_CollectorsId",
                         column: x => x.CollectorsId,
                         principalTable: "Collectors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AnimeFigures",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    Value = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    BrandId = table.Column<int>(type: "int", nullable: true),
-                    TypeId = table.Column<int>(type: "int", nullable: true),
-                    ImageFolderPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CollectionId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AnimeFigures", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AnimeFigures_Brands_BrandId",
-                        column: x => x.BrandId,
-                        principalTable: "Brands",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AnimeFigures_Collections_CollectionId",
-                        column: x => x.CollectionId,
-                        principalTable: "Collections",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AnimeFigures_Types_TypeId",
-                        column: x => x.TypeId,
-                        principalTable: "Types",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AnimeFigureCategory",
-                columns: table => new
-                {
-                    AnimeFiguresId = table.Column<int>(type: "int", nullable: false),
-                    CategoriesId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AnimeFigureCategory", x => new { x.AnimeFiguresId, x.CategoriesId });
-                    table.ForeignKey(
-                        name: "FK_AnimeFigureCategory_AnimeFigures_AnimeFiguresId",
-                        column: x => x.AnimeFiguresId,
-                        principalTable: "AnimeFigures",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AnimeFigureCategory_Categories_CategoriesId",
-                        column: x => x.CategoriesId,
-                        principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -224,11 +189,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AnimeFigureCategory_CategoriesId",
-                table: "AnimeFigureCategory",
-                column: "CategoriesId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AnimeFigureOrigin_OriginsId",
                 table: "AnimeFigureOrigin",
                 column: "OriginsId");
@@ -239,14 +199,14 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                 column: "BrandId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AnimeFigures_CategoryId",
+                table: "AnimeFigures",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AnimeFigures_CollectionId",
                 table: "AnimeFigures",
                 column: "CollectionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AnimeFigures_TypeId",
-                table: "AnimeFigures",
-                column: "TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CollectionCollector_CollectorsId",
@@ -268,9 +228,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AnimeFigureCategory");
-
-            migrationBuilder.DropTable(
                 name: "AnimeFigureOrigin");
 
             migrationBuilder.DropTable(
@@ -278,9 +235,6 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reviews");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Origins");
@@ -295,10 +249,10 @@ namespace AnimeFigureProject.DatabaseContext.Migrations
                 name: "Brands");
 
             migrationBuilder.DropTable(
-                name: "Collections");
+                name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Types");
+                name: "Collections");
         }
     }
 }

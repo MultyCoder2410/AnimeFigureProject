@@ -63,16 +63,16 @@
 
                         <div class="form-group space">
 
-                            @Html.Label("Type")
+                            @Html.Label("Category")
                             <select name="typeName" class="form-select">
 
-                                @if (Model.Types != null)
+                                @if (Model.Categories != null)
                                 {
 
-                                    @foreach (AnimeFigureProject.EntityModels.Type type in Model.Types)
+                                    @foreach (Category category in Model.Categories)
                                     {
 
-                                        <option value="@type.Name">@type.Name</option>
+                                        <option value="@category.Name">@category.Name</option>
 
                                     }
 
