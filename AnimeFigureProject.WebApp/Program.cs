@@ -1,6 +1,7 @@
 using AnimeFigureProject.DatabaseAccess;
 using AnimeFigureProject.DatabaseContext.Authentication;
 using AnimeFigureProject.DatabaseContext.Data;
+using AnimeFigureProject.WebApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +22,18 @@ namespace AnimeFigureProject.WebApp
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<SecurityDbContext>();
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+
+                options.SignIn.RequireConfirmedAccount = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.User.RequireUniqueEmail = true;
+
+            }).AddEntityFrameworkStores<SecurityDbContext>();
+
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<DataAccessService>();
+            builder.Services.AddScoped<UserManager<IdentityUser>, CollectorUserManager>();
 
             var app = builder.Build();
 

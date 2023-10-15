@@ -704,10 +704,10 @@ namespace AnimeFigureProject.DatabaseAccess
         /// </summary>
         /// <param name="id">Id of specific colection</param>
         /// <returns>Specific collection</returns>
-        public async Task<Collection?> GetCollection(int id, string authenticationUserId)
+        public async Task<Collection?> GetCollection(int? id, string authenticationUserId)
         {
 
-            if (applicationContext?.Collectors == null || applicationContext.Collections == null)
+            if (applicationContext?.Collectors == null || applicationContext.Collections == null || id == null)
                 return null;
 
             Collector? collector = await applicationContext.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == authenticationUserId);

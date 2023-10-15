@@ -1,11 +1,67 @@
 ﻿.CreateBox
 {
 
-    border: 1px solid #000000;
+    border-top: 1px solid #CCCCCC;
 
     margin-top: 2%;
+    margin-bottom: 2%;
+    padding-top: 2%;
 
     height: 80vh;
+
+}
+
+.AnimeFigureInput
+{
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+    margin-left: 2%;
+
+    width: 100%;
+
+}
+
+.OtherInput
+{
+
+    margin-left: 5%;
+    width: 120%;
+
+    font-size: 20px;
+
+}
+
+.ImageFiles
+{
+
+    position: relative;
+    margin-top: 23px;
+
+    width: 100%;
+    height: 83%
+
+}
+
+.ImageFiles input[type="file"]
+{
+
+    position: absolute;
+
+    bottom: 0;
+
+}
+
+.ImageFiles #ImagePreview img
+{
+
+    display: flex;
+    flex-wrap: wrap;
+
+    padding-bottom: 2%;
+
+    width: 25%;
 
 }
 
@@ -20,22 +76,56 @@
 #SubCreateBox
 {
 
-    margin-left: 50%;
-    padding-top: 1%;
+    margin-left: 1%;
 
     width: 100%;
 
 }
 
 
-#CreateBoxButtons 
+.CreateBoxButtons 
 {
 
-    display: inline-block;
     position: relative;
-
-    margin-top: 25%;
+    vertical-align: bottom;
 
     width: 100%;
+
+}
+
+.CreateButton
+{
+
+    float: right;
+
+}
+
+.space 
+{
+
+    margin-bottom: 1.5em;
+
+}
+
+.PriceValueInput
+{
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+}
+
+.PriceInput
+{
+
+    margin-right: 1%;
+    width: 99%;
+
+}
+
+.ValueInput
+{
+
+    width: 99%;
 
 }

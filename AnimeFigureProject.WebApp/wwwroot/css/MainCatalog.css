@@ -8,7 +8,7 @@ body
 .SearchBar
 {
 
-    background-color: #EEEEEE;
+    border-bottom: 1px solid #000000;
 
     position: relative;
     left: 0%;

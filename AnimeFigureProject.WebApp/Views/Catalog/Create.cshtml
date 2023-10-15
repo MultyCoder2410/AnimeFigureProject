@@ -8,115 +8,137 @@
 
 <link rel="stylesheet" href="~/css/CreateCatalog.css" asp-append-version="true" />
 
+<h1>Create anime figure</h1>
+
 <div class="CreateBox">
 
     <div class="row" id="SubCreateBox">
 
-        <div class="col-md-4">
+        <div class="col-md-10">
 
             <form asp-action="Create">
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <div class="form-group">
-                
-                    <label asp-for="NewAnimeFigure.Name" class="control-label"></label>
-                    <input asp-for="NewAnimeFigure.Name" class="form-control" />
-                    <span asp-validation-for="NewAnimeFigure.Name" class="text-danger"></span>
+                <div class="AnimeFigureInput">
 
-                </div>
+                    <div class="ImageFiles">
 
-                <div class="form-group">
-
-                     @Html.Label("Brand")
-                    <select name="brandName" class="form-control">
-
-                        @if (Model.Brands != null)
-                        {
-
-                            @foreach (Brand brand in Model.Brands)
-                            {
-
-                                <option value="@brand.Name">@brand.Name</option>
-
-                            }
-
-                        }
-
-                    </select >
-
-                </div>
-
-                <div class="form-group">
-                    
-                    @Html.Label("Type")
-                    <select name="typeName" class="form-control">
-
-                        @if (Model.Types != null)
-                        {
-
-                            @foreach (AnimeFigureProject.EntityModels.Type type in Model.Types)
-                            {
-
-                                <option value="@type.Name">@type.Name</option>
-
-                            }
-
-                        }
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    @Html.Label("Origin")
-                    <select class="form-control" id="originSelect">
-
-                        <option disabled selected>--Select options--</option>
-
-                        @if (Model.Origins != null)
-                        {
-
-                            @foreach (Origin origin in Model.Origins)
-                            {
-
-                                <option value="@origin.Name">@origin.Name</option>
-
-                            }
-
-                        }
-
-                    </select>
-
-                    <div id="Choosen">
-
-                        <input type="hidden" name="selectedOrigins" id="selectedOrigins" />
+                        <div id="ImagePreview"></div>
+                        <input id="formFile" class="form-control" type="file" name="images" multiple accept="image/*" onchange="PreviewImages(event)" />
 
                     </div>
 
-                </div>
 
-                <div class="form-group">
-                
-                    <label asp-for="NewAnimeFigure.Price" class="control-label"></label>
-                    <input asp-for="NewAnimeFigure.Price" type="number" class="form-control" />
-                    <span asp-validation-for="NewAnimeFigure.Price" class="text-danger"></span>
+                    <div class="col-md-50 OtherInput">
 
-                </div>
+                        <div class="form-group space">
 
-                <div class="form-group">
-               
-                    <label asp-for="NewAnimeFigure.Value" class="control-label"></label>
-                    <input asp-for="NewAnimeFigure.Value" type="number" class="form-control" />
-                    <span asp-validation-for="NewAnimeFigure.Value" class="text-danger"></span>
+                            <label asp-for="NewAnimeFigure.Name" class="control-label"></label>
+                            <input asp-for="NewAnimeFigure.Name" class="form-control" placeholder="Name" />
+                            <span asp-validation-for="NewAnimeFigure.Name" class="text-danger"></span>
 
-                </div>
+                        </div>
 
-                <div class="form-group" id="CreateBoxButtons">
+                        <div class="form-group space">
 
-                    <a asp-action="Index"><input type="button" value="Cancel" class="btn btn-primary" /></a>
-                    <input type="submit" value="Create" class="btn btn-primary" />
+                            @Html.Label("Brand")
+                            <select name="brandName" class="form-select">
+
+                                @if (Model.Brands != null)
+                                {
+
+                                    @foreach (Brand brand in Model.Brands)
+                                    {
+
+                                        <option value="@brand.Name">@brand.Name</option>
+
+                                    }
+
+                                }
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group space">
+
+                            @Html.Label("Type")
+                            <select name="typeName" class="form-select">
+
+                                @if (Model.Types != null)
+                                {
+
+                                    @foreach (AnimeFigureProject.EntityModels.Type type in Model.Types)
+                                    {
+
+                                        <option value="@type.Name">@type.Name</option>
+
+                                    }
+
+                                }
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group space">
+
+                            @Html.Label("Origin")
+                            <select id="originSelect" class="form-select">
+
+                                <option disabled selected>--Select options--</option>
+
+                                @if (Model.Origins != null)
+                                {
+
+                                    @foreach (Origin origin in Model.Origins)
+                                    {
+
+                                        <option value="@origin.Name">@origin.Name</option>
+
+                                    }
+
+                                }
+
+                            </select>
+
+                            <div id="Choosen">
+
+                                <input type="hidden" name="selectedOrigins" id="selectedOrigins" />
+
+                            </div>
+
+                        </div>
+
+                        <div class="PriceValueInput">
+
+                            <div class="form-group space">
+
+                                <label asp-for="NewAnimeFigure.Price" class="control-label"></label>
+                                <input asp-for="NewAnimeFigure.Price" class="PriceInput" type="number" class="form-control" />
+                                <span asp-validation-for="NewAnimeFigure.Price" class="text-danger"></span>
+
+                            </div>
+
+                            <div class="form-group space">
+
+                                <label asp-for="NewAnimeFigure.Value" class="control-label"></label>
+                                <input asp-for="NewAnimeFigure.Value" class="ValueInput" type="number" class="form-control" />
+                                <span asp-validation-for="NewAnimeFigure.Value" class="text-danger"></span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group CreateBoxButtons">
+
+                            <a asp-action="Index"><input type="button" value="Cancel" class="btn btn-primary" /></a>
+                            <input type="submit" value="Create" class="btn btn-primary CreateButton" />
+
+                        </div>
+
+                    </div>
 
                 </div>
 

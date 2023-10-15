@@ -34,3 +34,30 @@ function UpdateSelectedOrigins()
     document.getElementById('selectedOrigins').value = selectedOrigins;
 
 }
+
+function PreviewImages(event)
+{
+
+    document.getElementById("ImagePreview").innerHTML = '';
+    var ImageFiles = event.target.files;
+
+    for (var i = 0; i < ImageFiles.length; i++)
+    {
+
+        var CurrentFile = ImageFiles[i];
+        var Reader = new FileReader();
+
+        Reader.onload = function (e)
+        {
+
+            var Image = document.createElement('img');
+            Image.src = e.target.result;
+            document.getElementById("ImagePreview").appendChild(Image);
+
+        }
+
+        Reader.readAsDataURL(CurrentFile);
+
+    }
+
+}
