@@ -1,7 +1,6 @@
 ﻿.CreateBar 
 {
 
-    border-bottom: 1px solid #000000;
     position: relative;
     
     left: 0%;
@@ -19,6 +18,10 @@
 {
 
     margin-bottom: 0.5%;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    height: 29px;
 
 }
 
@@ -26,5 +29,12 @@
 {
 
     width: 90%;
+
+}
+
+td:hover
+{
+
+    background-color: #EEEEEE;
 
 }

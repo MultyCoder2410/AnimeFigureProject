@@ -31,6 +31,9 @@ namespace AnimeFigureProject.WebApp.Controllers
 
             List<Collection>? collections = await dataAccessService.GetCollections(loggedinUser);
 
+            if (collections == null)
+                collections = new List<Collection>();
+
             return View(collections);
 
         }
@@ -70,7 +73,7 @@ namespace AnimeFigureProject.WebApp.Controllers
         }
 
         // GET: MyCollections/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
 
             string? loggedinUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -89,7 +92,7 @@ namespace AnimeFigureProject.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TotalPrice,TotalValue,OwnerId")] Collection collection)
+        public async Task<IActionResult> Details(int id, [Bind("Id,Name,TotalPrice,TotalValue,OwnerId")] Collection? collection)
         {
 
             string? loggedinUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
