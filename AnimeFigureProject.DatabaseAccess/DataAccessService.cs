@@ -1,6 +1,7 @@
 ﻿using AnimeFigureProject.DatabaseContext.Data;
 using AnimeFigureProject.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AnimeFigureProject.DatabaseAccess
 {
@@ -140,10 +141,10 @@ namespace AnimeFigureProject.DatabaseAccess
         /// </summary>
         /// <param name="searchTerm">Name of anime figure</param>
         /// <param name="brandIds">The brands that you want to see the anime figures from</param>
-        /// <param name="TypeIds">The types that you want to see the anime figures from</param>
+        /// <param name="CategoryIds">The category that you want to see the anime figures from</param>
         /// <param name="originIds">The origins that you want to see the anime figures from</param>
         /// <returns>List of filtered anime figures</returns>
-        public async Task<List<AnimeFigure>?> GetFilteredAnimeFigures(string? searchTerm, int[]? brandIds, int[]? CategoryIds, int[]? originIds)
+        public async Task<List<AnimeFigure>?> GetFilteredAnimeFigures(string? searchTerm, int[]? brandIds, int[]? CategoryIds, int[]? originIds, int[]? YearOfReleases)
         {
 
             if (applicationContext?.AnimeFigures == null)
@@ -170,6 +171,9 @@ namespace AnimeFigureProject.DatabaseAccess
                 animeFigures = animeFigures.Where(f => filteredFigures.Contains(f.Id));
 
             }
+
+            if (YearOfReleases != null && YearOfReleases.Length > 0)
+                animeFigures = animeFigures.Where(f => f.YearOfRelease != null && YearOfReleases.Contains(f.YearOfRelease.Value));
 
             return await animeFigures.ToListAsync();
 
@@ -439,6 +443,21 @@ namespace AnimeFigureProject.DatabaseAccess
                 return null;
 
             return await applicationContext.Categories.ToListAsync();
+
+        }
+
+        /// <summary>
+        /// Gets all categories specified in id list.
+        /// </summary>
+        /// <param name="ids">Ids of specific origins</param>
+        /// <returns>List of categories with id's from id list</returns>
+        public async Task<List<Category>?> GetCategories(int[] ids)
+        {
+
+            if (applicationContext?.Categories == null)
+                return null;
+
+            return await applicationContext.Categories.Where(c => ids.Contains(c.Id)).ToListAsync();
 
         }
 

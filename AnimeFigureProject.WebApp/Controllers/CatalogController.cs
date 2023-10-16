@@ -2,8 +2,6 @@
 using AnimeFigureProject.EntityModels;
 using AnimeFigureProject.DatabaseAccess;
 using AnimeFigureProject.WebApp.Models;
-using AnimeFigureProject.WebApp.Models;
-using Microsoft.IdentityModel.Tokens;
 
 namespace AnimeFigureWebApp.Controllers
 {
@@ -29,15 +27,16 @@ namespace AnimeFigureWebApp.Controllers
         /// </summary>
         /// <param name="searchTerm">Name or part of the name of the figure you are searching for</param>
         /// <param name="brands">The brand of the figures you are searching for</param>
-        /// <param name="types">The type of the figures you are searching for</param>
+        /// <param name="categories">The category of the figures you are searching for</param>
         /// <param name="origins">The origins of the figures you are searching for</param>
         /// <returns>View with an AnimeFigureModel</returns>
-        public async Task<IActionResult> Index(string searchTerm, string brands, string types, string origins)
+        public async Task<IActionResult> Index(string searchTerm, string brands, string categories, string origins, string yearOfReleases)
         {
 
             int[]? brandIds = null;
-            int[]? typeIds = null;
+            int[]? categoryIds = null;
             int[]? originIds = null;
+            int[]? yearOfReleaseIds = null;
 
             if (!string.IsNullOrEmpty(brands))
             {
@@ -47,11 +46,11 @@ namespace AnimeFigureWebApp.Controllers
 
             }
 
-            if (!string.IsNullOrEmpty(types))
+            if (!string.IsNullOrEmpty(categories))
             {
 
-                string[] stringTypeIds = types.Split(",");
-                typeIds = Array.ConvertAll(stringTypeIds, int.Parse);
+                string[] stringCategoryIds = categories.Split(",");
+                categoryIds = Array.ConvertAll(stringCategoryIds, int.Parse);
 
             }
 
@@ -63,12 +62,20 @@ namespace AnimeFigureWebApp.Controllers
 
             }
 
+            if (!string.IsNullOrEmpty(yearOfReleases))
+            {
+
+                string[] stringYearOfReleaseIds = yearOfReleases.Split(",");
+                yearOfReleaseIds = Array.ConvertAll(stringYearOfReleaseIds, int.Parse);
+
+            }
+
             List<AnimeFigure>? animeFigures;
 
-            if (string.IsNullOrEmpty(searchTerm) && brandIds == null && typeIds == null && origins == null)
+            if (string.IsNullOrEmpty(searchTerm) && brandIds == null && categoryIds == null && origins == null)
                 animeFigures = await dataAccessService.GetAllAnimeFigures();
             else
-                animeFigures = await dataAccessService.GetFilteredAnimeFigures(searchTerm, brandIds, typeIds,originIds);
+                animeFigures = await dataAccessService.GetFilteredAnimeFigures(searchTerm, brandIds, categoryIds, originIds, yearOfReleaseIds);
 
             AllAnimeFiguresModel model = new AllAnimeFiguresModel
             (
@@ -126,7 +133,7 @@ namespace AnimeFigureWebApp.Controllers
         /// </summary>
         /// <param name="animeFigure">Contains name, value and price of figure</param>
         /// <param name="brandName">The name of the brand of the figure</param>
-        /// <param name="typeName">The type of the figure</param>
+        /// <param name="categoryName">The category of the figure</param>
         /// <returns>View of NewFigureModel or redirection to Index page</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
