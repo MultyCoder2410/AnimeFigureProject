@@ -16,7 +16,7 @@
 
         <div class="col-md-10">
 
-            <form asp-action="Create">
+            <form asp-action="Create" onsubmit="return UploadData(this)">
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -24,15 +24,25 @@
 
                     <div class="ImageFiles">
 
-                        <div id="ImagePreview"></div>
-                        <input id="formFile" class="form-control" type="file" name="images" multiple accept="image/*" onchange="PreviewImages(event)" />
+                        <div class="ImagePreview">
+
+                            <div id="MainImage">
+
+                            </div>
+
+                            <div id="SubImagePreview">
+                                
+                            </div>
+
+                        </div>
+                        <input id="formFile" class="form-control" type="file" name="images" accept="image/*" onchange="PreviewImages(event)" />
 
                     </div>
 
 
                     <div class="col-md-50 OtherInput">
 
-                        <div class="form-group space">
+                        <div class="form-group Spacing">
 
                             <label asp-for="NewAnimeFigure.Name" class="control-label"></label>
                             <input asp-for="NewAnimeFigure.Name" class="form-control" placeholder="Name" />
@@ -40,10 +50,14 @@
 
                         </div>
 
-                        <div class="form-group space">
+                        <div class="form-group Spacing Dropdown">
 
                             @Html.Label("Brand")
-                            <select name="brandName" class="form-select">
+                            <br />
+                            <input type="text" id="brandInput" name="brandName" />
+                            <select id="brandDropdown" onchange="ChangeBrand()">
+
+                                <option hidden disabled selected value="">(select an option)</option>
 
                                 @if (Model.Brands != null)
                                 {
@@ -61,10 +75,51 @@
 
                         </div>
 
-                        <div class="form-group space">
+                        <div class="form-group Spacing">
+
+                            <div class="Dropdown">
+
+                                @Html.Label("Origin")
+                                <br />
+                                <input type="text" id="originInput" />
+                                <input type="button" onclick="AddOrigin()" class="btn btn-primary AddOrigin" value="+" />
+
+                                <select id="originSelect" onchange="ChangeOrigin()">
+
+                                    <option hidden disabled selected value="">(select an option)</option>
+
+                                    @if (Model.Origins != null)
+                                    {
+
+                                        @foreach (Origin origin in Model.Origins)
+                                        {
+
+                                            <option value="@origin.Name">@origin.Name</option>
+
+                                        }
+
+                                    }
+
+                                </select>
+
+                            </div>
+
+                            <div id="Choosen">
+
+                                <input type="hidden" name="selectedOrigins" id="selectedOrigins" />
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group Spacing Dropdown">
 
                             @Html.Label("Category")
-                            <select name="typeName" class="form-select">
+                            <br />
+                            <input type="text" id="categoryInput" name="categoryName" />
+                            <select id="categoryDropdown" onchange="ChangeCategory()">
+
+                                <option hidden disabled selected value="">(select an option)</option>
 
                                 @if (Model.Categories != null)
                                 {
@@ -82,55 +137,42 @@
 
                         </div>
 
-                        <div class="form-group space">
+                        <div class="NumberInput">
 
-                            @Html.Label("Origin")
-                            <select id="originSelect" class="form-select">
-
-                                <option disabled selected>--Select options--</option>
-
-                                @if (Model.Origins != null)
-                                {
-
-                                    @foreach (Origin origin in Model.Origins)
-                                    {
-
-                                        <option value="@origin.Name">@origin.Name</option>
-
-                                    }
-
-                                }
-
-                            </select>
-
-                            <div id="Choosen">
-
-                                <input type="hidden" name="selectedOrigins" id="selectedOrigins" />
-
-                            </div>
-
-                        </div>
-
-                        <div class="PriceValueInput">
-
-                            <div class="form-group space">
+                            <div class="form-group Spacing">
 
                                 <label asp-for="NewAnimeFigure.Price" class="control-label"></label>
-                                <input asp-for="NewAnimeFigure.Price" class="PriceInput" type="number" class="form-control" />
+                                <input asp-for="NewAnimeFigure.Price" class="PriceInput" type="number" placeholder="Price" class="form-control" />
                                 <span asp-validation-for="NewAnimeFigure.Price" class="text-danger"></span>
 
                             </div>
 
-                            <div class="form-group space">
+                            <div class="form-group Spacing">
 
                                 <label asp-for="NewAnimeFigure.Value" class="control-label"></label>
-                                <input asp-for="NewAnimeFigure.Value" class="ValueInput" type="number" class="form-control" />
+                                <input asp-for="NewAnimeFigure.Value" class="ValueInput" type="number" placeholder="Value" class="form-control" />
                                 <span asp-validation-for="NewAnimeFigure.Value" class="text-danger"></span>
+
+                            </div>
+
+                            <div class="form-group Spacing">
+
+                                <label asp-for="NewAnimeFigure.YearOfRelease" class="control-label">Year of release</label>
+                                <input asp-for="NewAnimeFigure.YearOfRelease" class="ValueInput" type="number" placeholder="Year" min="1950" max="@DateTime.Now.Year" class="form-control" />
+                                <span asp-validation-for="NewAnimeFigure.YearOfRelease" class="text-danger"></span>
 
                             </div>
 
                         </div>
 
+                        <div class="DescriptionInputab-content Spacing">
+
+                            <label asp-for="NewAnimeFigure.Description" class="control-label"></label>
+                            <textarea asp-for="NewAnimeFigure.Description" class="ValueInput" rows="3" cols="50" maxlength="200"></textarea>
+                            <span asp-validation-for="NewAnimeFigure.Description" class="text-danger"></span>
+
+                        </div>
+                        
                         <div class="form-group CreateBoxButtons">
 
                             <a asp-action="Index"><input type="button" value="Cancel" class="btn btn-primary" /></a>

@@ -1,63 +1,96 @@
 var selectedOrigins = [];
-document.getElementById("originSelect").onchange = function (e)
+var uploadedImages = [];
+
+function AddOrigin()
 {
 
-    var newElement = document.createElement("button");
+    var inputElement = document.getElementById('originInput')
 
-    newElement.id = this.selectedIndex;
-    newElement.classList.add("btn", "btn-primary");
-    newElement.textContent = this[this.selectedIndex].text;
-
-    newElement.onclick = function ()
+    if (inputElement.value.length > 0)
     {
 
-        document.getElementById("Choosen").removeChild(this);
-        selectedOrigins.splice(selectedOrigins.indexOf(this.textContent), 1)
-        UpdateSelectedOrigins();
+        var newElement = document.createElement("button");
 
-    }
+        newElement.classList.add("btn", "btn-primary");
+        newElement.textContent = inputElement.value;
 
-    if (!document.getElementById(this.selectedIndex) && this.selectedIndex > 0)
-    {
+        newElement.onclick = function () {
+
+            document.getElementById("Choosen").removeChild(this);
+            selectedOrigins.splice(selectedOrigins.indexOf(this.textContent), 1)
+            document.getElementById('selectedOrigins').value = selectedOrigins;
+
+        }
 
         document.getElementById("Choosen").appendChild(newElement);
         selectedOrigins.push(newElement.textContent);
-        UpdateSelectedOrigins();
+        document.getElementById('selectedOrigins').value = selectedOrigins;
+
+        inputElement.value = '';
 
     }
-
-}
-
-function UpdateSelectedOrigins()
-{
-
-    document.getElementById('selectedOrigins').value = selectedOrigins;
 
 }
 
 function PreviewImages(event)
 {
 
-    document.getElementById("ImagePreview").innerHTML = '';
-    var ImageFiles = event.target.files;
+    var imageHtml = document.getElementById("MainImage").innerHTML;
+    document.getElementById("MainImage").innerHTML = '';
+    document.getElementById("SubImagePreview").innerHTML += imageHtml;
 
-    for (var i = 0; i < ImageFiles.length; i++)
+    var reader = new FileReader();
+
+    reader.onload = function (e)
     {
 
-        var CurrentFile = ImageFiles[i];
-        var Reader = new FileReader();
-
-        Reader.onload = function (e)
-        {
-
-            var Image = document.createElement('img');
-            Image.src = e.target.result;
-            document.getElementById("ImagePreview").appendChild(Image);
-
-        }
-
-        Reader.readAsDataURL(CurrentFile);
+        var image = document.createElement('img');
+        image.src = e.target.result;
+        document.getElementById("MainImage").appendChild(image);
 
     }
+
+    reader.readAsDataURL(event.target.files[0]);
+    uploadedImages.push(event.target.files[0]);
+
+}
+
+function UploadData(form)
+{
+
+    const formData = new FormData(form);
+
+    for (var i = 0; i < uploadedImages.length; i++)
+        formData.append('imagesData', uploadedImages[i]);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/Catalog/Create');
+    xhr.send(formData);
+
+    return false;
+
+}
+
+function ChangeCategory()
+{
+
+    document.getElementById("categoryInput").value = document.getElementById("categoryDropdown").value;
+    document.getElementById("categoryDropdown").selectedIndex = -1;
+
+}
+
+function ChangeOrigin()
+{
+
+    document.getElementById("originInput").value = document.getElementById("originSelect").value;
+    document.getElementById("originSelect").selectedIndex = -1;
+
+}
+
+function ChangeBrand()
+{
+
+    document.getElementById("brandInput").value = document.getElementById("brandDropdown").value;
+    document.getElementById("brandDropdown").selectedIndex = -1;
 
 }

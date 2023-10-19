@@ -6,161 +6,81 @@
 
 <link rel="stylesheet" href="~/css/MainCatalog.css" asp-append-version="true" />
 
-<div class="SearchBar">
+<div class="FilterBar">
 
-    <input type="text" id="SearchbarInput" name="MainSearchbar" placeholder="Search">
+    <h3>Brand</h3>
 
-    <div class="FilterDropdown">
+    @foreach(Brand brand in Model.Brands)
+    {
 
-        <input type="button" class="btn btn-secondary DropdownButton" value="Filter">
+        <input id = "@brand.Id" type = "checkbox" />
+        <label>@brand.Name</label>
+        
+    }
 
-        <div class="DropdownContent">
+    <h3>Origin</h3>
 
-            <div class="DropdownSubContent">
+    @foreach (Origin origin in Model.Origins)
+    {
 
-                <div class="DropDownCategory" id="Category">
+        <input id="@origin.Id" type="checkbox" />
+        <label>@origin.Name</label>
 
-                    <p>Category</p>
+    }
 
-                    <hr>
+    <h3>Category</h3>
 
-                    @foreach (Category category in Model.Categories)
-                    {
+    @foreach (Category category in Model.Categories)
+    {
 
-                        <div>
+        <input id="@category.Id" type="checkbox" />
+        <label>@category.Name</label>
 
-                            <input id="@category.Id" type="checkbox" />
-                            <label>@category.Name</label>
+    }
 
-                        </div>
+    <h3>Year of release</h3>
 
-                    }
+    <h3>Price</h3>
 
-                </div>
+    <h3>Value</h3>
 
-                <div class="DropDownCategory" id="Brand">
+</div>
 
-                    <p>Brand</p>
+<div class="Results">
 
-                    <hr>
+    <div class="SearchBar">
 
-                    @foreach (Brand brand in Model.Brands)
-                    {
-
-                        <div>
-
-                            <input id="@brand.Id" type="checkbox"/>
-                            <label>@brand.Name</label>
-
-                        </div>
-
-                    }
-
-                </div>
-
-                <div class="DropDownCategory" id="Origin">
-
-                    <p>Origin</p>
-
-                    <hr>
-
-                    @foreach (Origin origin in Model.Origins)
-                    {
-
-                        <div>
-
-                            <input id="@origin.Id" type="checkbox" />
-                            <label>@origin.Name</label>
-
-                        </div>
-
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
+        <input type="text" id="SearchbarInput" name="MainSearchbar" placeholder="Search">    
+        <a asp-action="Create"><input type="button" class="btn btn-primary" value="ADD NEW"></a>
 
     </div>
 
-    <div class="VerticalDiv">
+    <div class="AnimeFigureList">
 
-        <a asp-action="Create">
-            <input type="button" class="btn btn-secondary" value="Add figure">
-        </a>
+        @foreach (AnimeFigure animeFigure in Model.AnimeFigures)
+        {
+
+            <a asp-action="Details" asp-route-id="@animeFigure.Id">
+
+                <div class="card border-secondary mb-3" style="max-width: 20rem;">
+
+                    <img src="@Url.Action("GetImage", "Catalog", new { imageFolderPath = animeFigure.ImageFolderPath})" />
+                
+                    <div class="card-body">
+
+                        <h4 class="card-title">@animeFigure.Name</h4>
+                        <p class="card-text">Price: @animeFigure.Price <br />Value: @animeFigure.Value</p>
+
+                    </div>
+
+                </div>
+
+            </a>
+            
+        }
 
     </div>
 
 </div>
-
-<table class="table">
-
-    <thead>
-
-        <tr>
-
-            <th>
-                @Html.DisplayNameFor(model => model.AnimeFigures[0].Name)
-            </th>
-            
-            <th>
-                Type name
-            </th>
-
-            <th>
-                @Html.DisplayNameFor(model => model.AnimeFigures[0].Price)
-            </th>
-
-            <th>
-                @Html.DisplayNameFor(model => model.AnimeFigures[0].Value)
-            </th>
-            
-            <th></th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-        @foreach (var item in Model.AnimeFigures) 
-        {
-
-            <tr>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-
-                @if (item.Category != null)
-                {
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Category.Name)
-                    </td>
-
-                }
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.Value)
-                </td>
-
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-
-            </tr>
-
-        }
-
-    </tbody>
-
-</table>
 
 <script src="~/js/MainCatelog.js"></script>

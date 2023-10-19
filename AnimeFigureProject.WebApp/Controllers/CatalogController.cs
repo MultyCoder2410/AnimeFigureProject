@@ -22,6 +22,8 @@ namespace AnimeFigureWebApp.Controllers
 
         }
 
+        #region ViewAnimeFigures
+
         /// <summary>
         /// Gets list of anime figures based on filter and search results.
         /// </summary>
@@ -108,6 +110,22 @@ namespace AnimeFigureWebApp.Controllers
 
         }
 
+        public async Task<IActionResult> GetImage(string imageFolderPath)
+        {
+
+            string Path = imageFolderPath + "Image0.png";
+
+            if (System.IO.File.Exists(Path))
+                return File(await System.IO.File.ReadAllBytesAsync(Path), "image/png");
+
+            return NotFound();
+
+        }
+
+        #endregion
+
+        #region CreateNewAnimeFigure
+
         /// <summary>
         /// Shows create page for anime figure.
         /// </summary>
@@ -137,27 +155,56 @@ namespace AnimeFigureWebApp.Controllers
         /// <returns>View of NewFigureModel or redirection to Index page</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AnimeFigure animeFigure, string brandName, string categoryName, string selectedOrigins)
+        public async Task<IActionResult> Create(AnimeFigure NewAnimeFigure, string brandName, string categoryName, string selectedOrigins, List<IFormFile> imagesData)
         {
 
             if (ModelState.IsValid)
             {
 
+                NewAnimeFigure.ImageFolderPath = "Images/" + NewAnimeFigure.Name + "/";
+
+                if (!Directory.Exists(NewAnimeFigure.ImageFolderPath))
+                    Directory.CreateDirectory(NewAnimeFigure.ImageFolderPath);
+
+                for (int i = 0; i < imagesData.Count; i++)
+                {
+
+                    var imagePath = NewAnimeFigure.ImageFolderPath + "Image" + i.ToString() + ".png";
+
+                    using (FileStream writer = new FileStream(imagePath, FileMode.Create))
+                    {
+
+                        await imagesData[i].CopyToAsync(writer);
+
+                    }
+
+                }
+
                 string[] allSelectedOrigins = selectedOrigins.Split(",");
 
-                animeFigure.Brand = await dataAccessService.GetBrand(brandName);
-                animeFigure.Category = await dataAccessService.GetCategory(categoryName);
-                animeFigure.Origins = await dataAccessService.GetOrigins(Array.ConvertAll(allSelectedOrigins, int.Parse));
+                NewAnimeFigure.Brand = (await dataAccessService.GetBrand(brandName) ?? await dataAccessService.CreateBrand(new Brand { Name = brandName }));
+                NewAnimeFigure.Category = (await dataAccessService.GetCategory(categoryName) ?? await dataAccessService.CreateCategory(new Category { Name = categoryName }));
 
-                await dataAccessService.CreateAnimeFigure(animeFigure);
+                NewAnimeFigure.Origins = new List<Origin>();
+                foreach (string originName in allSelectedOrigins)
+                {
 
-                return RedirectToAction(nameof(Index));
+                    Origin? animeFigureOrigin = await dataAccessService.GetOrigin(originName) ?? await dataAccessService.CreateOrigin(new Origin { Name = originName });
+                        
+                    if (animeFigureOrigin != null)
+                        NewAnimeFigure.Origins.Add(animeFigureOrigin);
+
+                }
+
+                await dataAccessService.CreateAnimeFigure(NewAnimeFigure);
+
+                return RedirectToAction("Index", new { searchTerm = "", brands = "", categories = "", origins = "", yearOfRelease = "" });
 
             }
 
             CreateAnimeFigureModel model = new CreateAnimeFigureModel(
 
-                NewAnimeFigure: animeFigure,
+                NewAnimeFigure: NewAnimeFigure,
                 Brands: await dataAccessService.GetBrands(),
                 Categories: await dataAccessService.GetCategories(),
                 Origins: await dataAccessService.GetOrigins()
@@ -167,6 +214,8 @@ namespace AnimeFigureWebApp.Controllers
             return View(model);
 
         }
+
+        #endregion 
 
         /// <summary>
         /// Checks if anime figure with id exists in database.
