@@ -110,6 +110,11 @@ namespace AnimeFigureWebApp.Controllers
 
         }
 
+        /// <summary>
+        /// Returns the first image(Image0.png) in given folder path.
+        /// </summary>
+        /// <param name="imageFolderPath">Folder in wich the image can be found</param>
+        /// <returns></returns>
         public async Task<IActionResult> GetImage(string imageFolderPath)
         {
 

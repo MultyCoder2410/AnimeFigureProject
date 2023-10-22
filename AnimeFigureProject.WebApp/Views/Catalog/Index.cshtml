@@ -12,7 +12,7 @@
 
         <div id="Brand">
 
-            <h3>Brand</h3>
+            <h4>Brand</h4>
 
             @if (Model.Brands != null)
             {
@@ -32,7 +32,7 @@
 
         <div id="Origin">
 
-            <h3>Origin</h3>
+            <h4>Origin</h4>
 
             @if (Model.Origins != null)
             {
@@ -52,7 +52,7 @@
 
         <div id="Category">
 
-            <h3>Category</h3>
+            <h4>Category</h4>
 
             @if (Model.Categories != null)
             {
@@ -70,17 +70,17 @@
 
         </div>
 
-        <h3>Year of release</h3>
+        <h4>Year of release</h4>
         <input type="number" placeholder="Start" min="1950" max="@DateTime.Now.Year" />
         <input type="number" placeholder="End" min="1950" max="@DateTime.Now.Year" />
         <input type="button" value="GO" class="btn btn-primary" />
 
-        <h3>Price</h3>
+        <h4>Price</h4>
         <input type="number" placeholder="Min" />
         <input type="number" placeholder="Max" />
         <input type="button" value="GO" class="btn btn-primary" />
 
-        <h3>Value</h3>
+        <h4>Value</h4>
         <input type="number" placeholder="Min" />
         <input type="number" placeholder="Max" />
         <input type="button" value="GO" class="btn btn-primary" />
