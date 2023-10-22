@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AnimeFigureProject.EntityModels;
 using AnimeFigureProject.DatabaseAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace AnimeFigureProject.Api.Controllers
 {
@@ -154,9 +154,24 @@ namespace AnimeFigureProject.Api.Controllers
             await dataAccessService.DeleteCollector(dataAccessService.GetCollector(userId).Id);
 
             return Ok("Deleted account.");
-
         }
 
+        /// <summary>
+        /// Returns list of collectors without collections and authentication id.
+        /// </summary>
+        /// <returns>List of collectors</returns>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Collector>>> GetCollectors()
+        {
+
+            IEnumerable<Collector>? collectors = await dataAccessService.GetCollectors();
+
+            if (collectors == null)
+                return NotFound();
+
+            return collectors.ToList();
+
+        }
 
         /// <summary>
         /// Gets current logged in collector from database.
@@ -164,7 +179,7 @@ namespace AnimeFigureProject.Api.Controllers
         /// <returns>Logged in collector</returns>
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Collector>> GetLoggedInCollector()
+        public async Task<ActionResult<Collector>> GetLoggedInCollector(int id)
         {
 
             if (userManager == null)
@@ -177,7 +192,7 @@ namespace AnimeFigureProject.Api.Controllers
 
             Collector? collector = await dataAccessService.GetCollector(user.Id);
 
-            if (collector == null)
+            if (collector == null || collector.Id != id)
                 return NotFound("No collector was found");
 
             return collector;

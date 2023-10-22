@@ -99,9 +99,9 @@ namespace AnimeFigureProject.Api.Controllers
             Origin? newOrigin = await dataAccessService.CreateOrigin(origin);
 
             if (newOrigin == null)
-                return Problem("newBrand is null");
+                return Problem("newOrigin is null");
 
-            return CreatedAtAction("GetCategory", new { id = newOrigin.Id }, newOrigin);
+            return CreatedAtAction("GetOrigin", new { id = newOrigin.Id }, newOrigin);
 
         }
 

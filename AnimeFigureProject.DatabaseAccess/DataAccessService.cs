@@ -21,6 +21,20 @@ namespace AnimeFigureProject.DatabaseAccess
         #region Collector
 
         /// <summary>
+        /// Returns list of collectors without collection or authentication id.
+        /// </summary>
+        /// <returns>List of collectors</returns>
+        public async Task<List<Collector>?> GetCollectors()
+        {
+
+            if (applicationContext?.Collectors == null)
+                return null;
+
+            return await applicationContext.Collectors.Select(c => new Collector { Id = c.Id, Name = c.Name }).ToListAsync();
+
+        }
+
+        /// <summary>
         /// Gets specific collector data.
         /// </summary>
         /// <param name="id">Id of the specific collector</param>
@@ -696,15 +710,23 @@ namespace AnimeFigureProject.DatabaseAccess
         /// <param name="collectionId">Id of collection to add anime figure to</param>
         /// <param name="animeFigure">Anime figure to add to collection</param>
         /// <returns>The collection that got updated</returns>
-        public async Task<Collection?> AddAnimeFigureToCollection(int collectionId, AnimeFigure animeFigure)
+        public async Task<Collection?> AddAnimeFigureToCollection(int collectionId, AnimeFigure animeFigure, string authenticationUserId)
         {
 
-            if (applicationContext?.Collections == null)
+            if (applicationContext?.Collections == null || applicationContext?.Collectors == null)
                 return null;
 
-            Collection? collection = await applicationContext.Collections.FirstOrDefaultAsync(c => c.Id == collectionId);
+            Collector? collector = await applicationContext.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == authenticationUserId);
+
+            if (collector == null)
+                return null;
+
+            Collection? collection = await applicationContext.Collections.FirstOrDefaultAsync(c => c.Id == collectionId && c.OwnerId == collector.Id);
 
             if (collection == null)
+                return null;
+
+            if (applicationContext.AnimeFigures == null || !(await applicationContext.AnimeFigures.ContainsAsync(animeFigure)))
                 return null;
 
             collection.AnimeFigures?.Add(animeFigure);
@@ -724,10 +746,15 @@ namespace AnimeFigureProject.DatabaseAccess
         /// <param name="collectionId">Id of collection from which the anime figure has to be deleted</param>
         /// <param name="animeFigure">The anime figure to remove from collection</param>
         /// <returns>The collection from which the anime figure was removed</returns>
-        public async Task<Collection?> RemoveAnimeFigureFromCollection(int collectionId, AnimeFigure animeFigure)
+        public async Task<Collection?> RemoveAnimeFigureFromCollection(int collectionId, AnimeFigure animeFigure, string authenticationUserId)
         {
 
-            if (applicationContext?.Collections == null)
+            if (applicationContext?.Collections == null || applicationContext?.Collectors == null)
+                return null;
+
+            Collector? collector = await applicationContext.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == authenticationUserId);
+
+            if (collector == null)
                 return null;
 
             Collection? collection = await applicationContext.Collections.FirstOrDefaultAsync(c => c.Id == collectionId);
