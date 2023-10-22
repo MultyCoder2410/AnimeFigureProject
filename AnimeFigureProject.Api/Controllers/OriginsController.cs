@@ -7,7 +7,7 @@ namespace AnimeFigureProject.Api.Controllers
 {
 
     /// <summary>
-    /// This controller allows you to modify and view categories withing the database
+    /// This controller allows you to modify and view origins withing the database
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
@@ -45,10 +45,10 @@ namespace AnimeFigureProject.Api.Controllers
         }
 
         /// <summary>
-        /// Gets specific category from database.
+        /// Gets specific origin from database.
         /// </summary>
-        /// <param name="id">Id of specific category</param>
-        /// <returns>Specific category</returns>
+        /// <param name="id">Id of specific origin</param>
+        /// <returns>Specific origin</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Origin>> GetOrigin(int id)
         {

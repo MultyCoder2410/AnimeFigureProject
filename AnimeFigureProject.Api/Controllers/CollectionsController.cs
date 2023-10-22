@@ -10,7 +10,7 @@ namespace AnimeFigureProject.Api.Controllers
 {
 
     /// <summary>
-    /// This controller allows you to modify and view collectios withing the database.
+    /// This controller allows you to modify and view collections withing the database.
     /// You need to be logged in with collector to view collection.
     /// </summary>
     [Authorize]

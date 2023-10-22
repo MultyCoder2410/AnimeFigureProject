@@ -614,14 +614,26 @@ namespace AnimeFigureProject.DatabaseAccess
         /// Deletes review from database.
         /// </summary>
         /// <param name="review">The review to delete</param>
-        public async void DeleteReview(Review review)
+        public async Task<bool> DeleteReview(int id, string authenticationUserId)
         {
 
-            if (applicationContext?.Reviews == null)
-                return;
+            if (applicationContext?.Reviews == null || applicationContext?.Collectors == null)
+                return false;
+
+            Collector? collector = await applicationContext.Collectors.FirstOrDefaultAsync(c => c.AuthenticationUserId == authenticationUserId);
+
+            if (collector == null)
+                return false;
+
+            Review? review = await applicationContext.Reviews.Include(r => r.Owner).FirstOrDefaultAsync(r => r.Id == id && r.Owner != null && r.Owner.Id == collector.Id);
+
+            if (review == null)
+                return false;
 
             applicationContext.Reviews.Remove(review);
             await applicationContext.SaveChangesAsync();
+
+            return true;
 
         }
 
