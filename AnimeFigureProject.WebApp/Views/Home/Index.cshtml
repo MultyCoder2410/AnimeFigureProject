@@ -1,4 +1,44 @@
-﻿@{
+﻿@using AnimeFigureProject.EntityModels;
+@model List<AnimeFigureProject.EntityModels.AnimeFigure>
+@{
     ViewData["Title"] = "Home Page";
 }
+
+<link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
+
+<img class="Banner" />
+
+<div class="NewFigureHeader">
+
+    <h4>New Figures</h4>
+    <a asp-controller="Catalog">See All</a>
+
+</div>
+
+<div class="NewAnimeFigureList">
+
+    @for (int i = Model.Count - 1; i >= 0 && (Model.Count - i) >= (Model.Count - 10); i--)
+    {
+
+        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model[i].Id">
+
+            <div class="card border-secondary mb-3" style="max-width: 20rem;">
+
+                <img src="@Url.Action("GetImage", "Catalog", new { imageFolderPath = Model[i].ImageFolderPath})" />
+
+                <div class="card-body">
+
+                    <h4 class="card-title">@Model[i].Name</h4>
+                    <p class="card-text">Price: @Model[i].Price <br />Value: @Model[i].Value</p>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    }
+
+</div>
+
 

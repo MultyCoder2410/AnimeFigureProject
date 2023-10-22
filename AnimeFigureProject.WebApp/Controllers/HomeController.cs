@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace AnimeFigureProject.WebApp.Controllers
 {
+
     public class HomeController : Controller
     {
 
@@ -19,12 +20,21 @@ namespace AnimeFigureProject.WebApp.Controllers
 
         }
 
+        /// <summary>
+        /// Returns the view of the home page with all the animefigures.
+        /// </summary>
+        /// <returns>View of home page with animefigures</returns>
         public async Task<IActionResult> Index()
         {
 
-            return View();
+            return View(await dataAccessService.GetAllAnimeFigures());
+
         }
 
+        /// <summary>
+        /// Returns error view with some error information.
+        /// </summary>
+        /// <returns>Error view</returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -34,4 +44,5 @@ namespace AnimeFigureProject.WebApp.Controllers
         }
 
     }
+
 }

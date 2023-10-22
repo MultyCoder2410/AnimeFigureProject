@@ -2,7 +2,7 @@ function updateUrlWithFilters(searchTerm)
 {
 
     var selectedBrands = [];
-    var selectedTypes = [];
+    var selectedCategories = [];
     var selectedOrigins = [];
 
     $('#Brand input[type="checkbox"]:checked').each(function ()
@@ -12,10 +12,10 @@ function updateUrlWithFilters(searchTerm)
 
     });
 
-    $('#Type input[type="checkbox"]:checked').each(function ()
+    $('#Category input[type="checkbox"]:checked').each(function ()
     {
 
-        selectedTypes.push($(this).attr('id'));
+        selectedCategories.push($(this).attr('id'));
 
     });
 
@@ -31,8 +31,8 @@ function updateUrlWithFilters(searchTerm)
     if (selectedBrands.length > 0)
         url += '&brands=' + selectedBrands.join(',');
 
-    if (selectedTypes.length > 0)
-        url += '&types=' + selectedTypes.join(',');
+    if (selectedCategories.length > 0)
+        url += '&categories=' + selectedCategories.join(',');
 
     if (selectedOrigins.length > 0)
         url += '&origins=' + selectedOrigins.join(',');
@@ -77,7 +77,7 @@ document.querySelectorAll('#Brand input[type="checkbox"]').forEach(function (che
 
 });
 
-document.querySelectorAll('#Type input[type="checkbox"]').forEach(function (checkbox)
+document.querySelectorAll('#Category input[type="checkbox"]').forEach(function (checkbox)
 {
 
     checkbox.addEventListener('change', function ()
@@ -103,7 +103,7 @@ document.querySelectorAll('#Origin input[type="checkbox"]').forEach(function (ch
 
 });
 
-$(document).ready(function ()
+document.addEventListener("DOMContentLoaded", function ()
 {
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -122,13 +122,13 @@ $(document).ready(function ()
 
     }
 
-    const types = urlParams.get('types');
+    const categories = urlParams.get('categories');
 
-    if (types != null)
+    if (categories != null)
     {
 
-        allTypes = types.split(',');
-        allTypes.forEach(typeId => { $('#Type #' + typeId).prop('checked', true); });
+        allCategories = categories.split(',');
+        allCategories.forEach(categoryId => { $('#Category #' + categoryId).prop('checked', true); });
 
     }
 

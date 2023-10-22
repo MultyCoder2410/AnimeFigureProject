@@ -6,78 +6,121 @@
 
 <link rel="stylesheet" href="~/css/MainCatalog.css" asp-append-version="true" />
 
-<div class="FilterBar">
+<div class="CatalogContainer">
 
-    <h3>Brand</h3>
+    <div class="FilterBar">
 
-    @foreach(Brand brand in Model.Brands)
-    {
+        <div id="Brand">
 
-        <input id = "@brand.Id" type = "checkbox" />
-        <label>@brand.Name</label>
-        
-    }
+            <h3>Brand</h3>
 
-    <h3>Origin</h3>
+            @if (Model.Brands != null)
+            {
 
-    @foreach (Origin origin in Model.Origins)
-    {
+                @foreach (Brand brand in Model.Brands)
+                {
 
-        <input id="@origin.Id" type="checkbox" />
-        <label>@origin.Name</label>
+                    <input id = "@brand.Id" type = "checkbox" />
+                    <label>@brand.Name</label>
+                    <br />
 
-    }
+                }
 
-    <h3>Category</h3>
+            }
 
-    @foreach (Category category in Model.Categories)
-    {
+        </div>
 
-        <input id="@category.Id" type="checkbox" />
-        <label>@category.Name</label>
+        <div id="Origin">
 
-    }
+            <h3>Origin</h3>
 
-    <h3>Year of release</h3>
+            @if (Model.Origins != null)
+            {
 
-    <h3>Price</h3>
+                @foreach (Origin origin in Model.Origins)
+                {
 
-    <h3>Value</h3>
+                    <input id="@origin.Id" type="checkbox" />
+                    <label>@origin.Name</label>
+                    <br />
 
-</div>
+                }
 
-<div class="Results">
+            }
 
-    <div class="SearchBar">
+        </div>
 
-        <input type="text" id="SearchbarInput" name="MainSearchbar" placeholder="Search">    
-        <a asp-action="Create"><input type="button" class="btn btn-primary" value="ADD NEW"></a>
+        <div id="Category">
+
+            <h3>Category</h3>
+
+            @if (Model.Categories != null)
+            {
+
+                @foreach (Category category in Model.Categories)
+                {
+
+                    <input id="@category.Id" type="checkbox" />
+                    <label>@category.Name</label>
+                    <br />
+
+                }
+
+            }
+
+        </div>
+
+        <h3>Year of release</h3>
+        <input type="number" placeholder="Start" min="1950" max="@DateTime.Now.Year" />
+        <input type="number" placeholder="End" min="1950" max="@DateTime.Now.Year" />
+        <input type="button" value="GO" class="btn btn-primary" />
+
+        <h3>Price</h3>
+        <input type="number" placeholder="Min" />
+        <input type="number" placeholder="Max" />
+        <input type="button" value="GO" class="btn btn-primary" />
+
+        <h3>Value</h3>
+        <input type="number" placeholder="Min" />
+        <input type="number" placeholder="Max" />
+        <input type="button" value="GO" class="btn btn-primary" />
 
     </div>
 
-    <div class="AnimeFigureList">
+    <div class="Results">
 
-        @foreach (AnimeFigure animeFigure in Model.AnimeFigures)
-        {
+        <div class="SearchBar">
 
-            <a asp-action="Details" asp-route-id="@animeFigure.Id">
+            <input type="text" id="SearchbarInput" name="MainSearchbar" placeholder="Search">    
+            <a asp-action="Create"><input type="button" class="btn btn-primary" value="ADD NEW"></a>
 
-                <div class="card border-secondary mb-3" style="max-width: 20rem;">
+        </div>
 
-                    <img src="@Url.Action("GetImage", "Catalog", new { imageFolderPath = animeFigure.ImageFolderPath})" />
+        <div class="AnimeFigureList">
+
+            @foreach (AnimeFigure animeFigure in Model.AnimeFigures)
+            {
+
+                <a asp-action="Details" asp-route-id="@animeFigure.Id">
+
+                    <div class="card border-secondary mb-3" style="max-width: 20rem;">
+
+                        <img src="@Url.Action("GetImage", "Catalog", new { imageFolderPath = animeFigure.ImageFolderPath})" />
                 
-                    <div class="card-body">
+                        <div class="card-body">
 
-                        <h4 class="card-title">@animeFigure.Name</h4>
-                        <p class="card-text">Price: @animeFigure.Price <br />Value: @animeFigure.Value</p>
+                            <h4 class="card-title">@animeFigure.Name</h4>
+                            <p class="card-text">Price: @animeFigure.Price <br />Value: @animeFigure.Value</p>
+
+                        </div>
 
                     </div>
 
-                </div>
-
-            </a>
+                </a>
             
-        }
+            }
+
+        </div>
 
     </div>
 

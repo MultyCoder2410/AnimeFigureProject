@@ -49,19 +49,24 @@
     position:relative;
     vertical-align: bottom;
 
+    margin-top: 1%;
+
     width: 100%;
 
 }
 
 .ImagePreview #MainImage
 {
+
     aspect-ratio: 1 / 1;
 
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    
     margin-left: 10%;
 
     width: 80%;
-
-    background-color: red;
 
 }
 
@@ -73,13 +78,15 @@
 
     padding-bottom: 2%;
 
-    width: 100%;
+    max-width: 100%;
     height: 100%;
 
 }
 
 .ImagePreview #SubImagePreview
 {
+
+    border-top: 1px solid #AAAAAA;
 
     overflow-x: auto;
     white-space: nowrap;
@@ -96,7 +103,8 @@
 
     aspect-ratio: 1 / 1;
 
-    border: 1px solid #000000;
+    border: 1px solid #AAAAAA;
+    border-radius: 10px;
 
     margin-top: 1%;
     margin-bottom: 1%;
