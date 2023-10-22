@@ -28,7 +28,7 @@ namespace AnimeFigureProject.Api.Controllers
 
         }
 
-        //// <summary>
+        /// <summary>
         /// Gets list of reviews from database.
         /// </summary>
         /// <returns>List of reviews</returns>
@@ -46,10 +46,10 @@ namespace AnimeFigureProject.Api.Controllers
         }
 
         /// <summary>
-        /// Gets specific category from database.
+        /// Gets specific review from database.
         /// </summary>
-        /// <param name="id">Id of specific category</param>
-        /// <returns>Specific category</returns>
+        /// <param name="id">Id of specific review</param>
+        /// <returns>Specific review</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Review>> GetReview(int id)
         {
