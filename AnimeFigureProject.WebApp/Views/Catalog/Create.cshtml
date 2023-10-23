@@ -16,7 +16,7 @@
 
         <div class="col-md-10">
 
-            <form asp-action="Create" onsubmit="UploadData(this)">
+            <form asp-action="Create" onsubmit="return UploadData(this)">
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 

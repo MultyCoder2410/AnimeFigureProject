@@ -223,7 +223,7 @@ namespace AnimeFigureWebApp.Controllers
 
                 await dataAccessService.CreateAnimeFigure(NewAnimeFigure);
 
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Catalog") });
 
             }
 

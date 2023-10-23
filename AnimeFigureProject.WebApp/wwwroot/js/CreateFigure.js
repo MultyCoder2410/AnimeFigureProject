@@ -64,6 +64,21 @@ function UploadData(form)
         formData.append('imagesData', uploadedImages[i]);
 
     const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+
+        if (xhr.readyState === 4) {
+
+            if (xhr.status === 200) {
+
+                var response = JSON.parse(xhr.responseText);
+                if (response.success)
+                    window.location.href = response.redirectUrl;
+
+            }
+
+        }
+    };
+
     xhr.open('POST', '/Catalog/Create');
     xhr.send(formData);
 
