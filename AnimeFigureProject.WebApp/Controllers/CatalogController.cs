@@ -32,7 +32,7 @@ namespace AnimeFigureWebApp.Controllers
         /// <param name="categories">The category of the figures you are searching for</param>
         /// <param name="origins">The origins of the figures you are searching for</param>
         /// <returns>View with an AnimeFigureModel</returns>
-        public async Task<IActionResult> Index(string searchTerm, string brands, string categories, string origins, string yearOfReleases)
+        public async Task<IActionResult> Index(string? searchTerm, string? brands, string? categories, string? origins, string? yearOfReleases)
         {
 
             int[]? brandIds = null;
@@ -203,7 +203,7 @@ namespace AnimeFigureWebApp.Controllers
 
                 await dataAccessService.CreateAnimeFigure(NewAnimeFigure);
 
-                return RedirectToAction("Index", new { searchTerm = "", brands = "", categories = "", origins = "", yearOfRelease = "" });
+                return RedirectToAction(nameof(Index));
 
             }
 
@@ -221,13 +221,6 @@ namespace AnimeFigureWebApp.Controllers
         }
 
         #endregion 
-
-        /// <summary>
-        /// Checks if anime figure with id exists in database.
-        /// </summary>
-        /// <param name="id">Id of anime figure to check for</param>
-        /// <returns>If anime figure exists</returns>
-        private bool AnimeFigureExists(int id) { return dataAccessService.GetAnimeFigure(id) != null; }
 
     }
 
