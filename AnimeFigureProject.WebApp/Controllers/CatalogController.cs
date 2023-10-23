@@ -106,7 +106,27 @@ namespace AnimeFigureWebApp.Controllers
             if (animeFigure == null)
                 return NotFound();
 
-            return View(animeFigure);
+            int imageCount = Directory.GetFiles(animeFigure.ImageFolderPath).Length;
+            List<string> images = new List<string>();
+
+            for (int i = 0; i < imageCount; i++)
+            {
+                
+                var imagePath = Path.Combine(animeFigure.ImageFolderPath, "Image" + i.ToString() + ".png");
+
+                if (System.IO.File.Exists(imagePath))
+                    images.Add(Url.Content(imagePath));
+
+            }
+
+            DetailAnimeFigureModel animeFigureModel = new DetailAnimeFigureModel(
+
+                NewAnimeFigure: animeFigure,
+                Images: images
+
+            );
+
+            return View(animeFigureModel);
 
         }
 

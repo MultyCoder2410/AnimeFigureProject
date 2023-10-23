@@ -204,7 +204,7 @@ namespace AnimeFigureProject.DatabaseAccess
             if (applicationContext?.AnimeFigures == null)
                 return null;
 
-            return await applicationContext.AnimeFigures.SingleOrDefaultAsync(f => f.Id == id);
+            return await applicationContext.AnimeFigures.Include(f => f.Brand).Include(f => f.Category).Include(f => f.Origins).SingleOrDefaultAsync(f => f.Id == id);
 
         }
 
