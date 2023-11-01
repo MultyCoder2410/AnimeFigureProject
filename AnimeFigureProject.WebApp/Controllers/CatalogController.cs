@@ -107,7 +107,7 @@ namespace AnimeFigureWebApp.Controllers
                 return NotFound();
 
             int imageCount = Directory.GetFiles(animeFigure.ImageFolderPath).Length;
-            List<string> images = new List<string>();
+            List<FileContentResult> images = new List<FileContentResult>();
 
             for (int i = 0; i < imageCount; i++)
             {
@@ -115,7 +115,7 @@ namespace AnimeFigureWebApp.Controllers
                 var imagePath = Path.Combine(animeFigure.ImageFolderPath, "Image" + i.ToString() + ".png");
 
                 if (System.IO.File.Exists(imagePath))
-                    images.Add(Url.Content(imagePath));
+                    images.Add(File(await System.IO.File.ReadAllBytesAsync(imagePath), "image/png"));
 
             }
 

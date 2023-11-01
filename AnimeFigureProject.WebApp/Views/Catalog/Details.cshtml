@@ -22,7 +22,7 @@
 
                 <div id="MainImage">
 
-                    <img src="@Model.Images[0]" />
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Images[0].FileContents)" />
 
                 </div>
 
@@ -31,7 +31,7 @@
                     @for (int i = 1; i < Model.Images.Count(); i++)
                     {
 
-                        <img src="@Model.Images[i]" />
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Images[i].FileContents)" />
 
                     }
 
